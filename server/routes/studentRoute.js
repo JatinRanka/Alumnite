@@ -159,6 +159,18 @@ router.post('/attend-event/:id', studentAuth, (req, res) =>{
 });
 
 
-
 module.exports = router;
+
+
+
+
+
+
+
+
+
+
+
+
+
 
