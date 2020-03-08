@@ -12,30 +12,30 @@ const {Event} = require('./../models/eventModel.js');
 const {studentAuth} = require('../middleware/studentAuth.js');
 
 // dummy update for test
-router.post('/test',studentAuth, (req, res) => {
-    var student = req.student;
+// router.post('/test',studentAuth, (req, res) => {
+//     var student = req.student;
 
-    student.update({collegeId : req.body.collegeId})
-        .then(() => {
-            res.send("successfuly updtaed")
-        })
-        .catch((err) => {
-            res.status(400).send(err)
-        })
-})
+//     student.update({collegeId : req.body.collegeId})
+//         .then(() => {
+//             res.send("successfuly updtaed")
+//         })
+//         .catch((err) => {
+//             res.status(400).send(err)
+//         })
+// })
 
-router.get('/test' , studentAuth, (req, res) => {
-    req.student
-        .populate('collegeId')
-        .execPopulate(function (err, collegePopulated){
-            if(err){
-                res.status(400).send(err)
-            }
-            // fetching only the events array
-            // from the whole college profile.
-            res.send(collegePopulated)
-        });
-})
+// router.get('/test' , studentAuth, (req, res) => {
+//     req.student
+//         .populate('collegeId')
+//         .execPopulate(function (err, collegePopulated){
+//             if(err){
+//                 res.status(400).send(err)
+//             }
+//             // fetching only the events array
+//             // from the whole college profile.
+//             res.send(collegePopulated)
+//         });
+// })
 
 /*
  @Type: POST
