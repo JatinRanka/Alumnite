@@ -2,11 +2,19 @@ const mongoose = require('mongoose');
 
 const JobSchema = new mongoose.Schema({
     
+    // Alumni Id
     postedBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Student',
         required: true
     },
+    // College Id
+    collegeId:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'College',
+        required: true
+    },
+
     company: {
         type: String,
         required: true

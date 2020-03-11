@@ -140,5 +140,58 @@ router.get('/events', collegeAuth, (req, res) => {
 });
 
 
+router.get('/job', collegeAuth, (req, res) => {
+
+    let parameters = req.query;
+
+    var paramSkillsRequired = [];
+
+    if(parameters.skillsRequired){
+
+        if( Array.isArray(parameters.skillsRequired) ){
+            paramSkillsRequired = parameters.skillsRequired;
+        } else{
+            paramSkillsRequired = [parameters.skillsRequired];
+        }
+
+        delete parameters.skillsRequired;
+    }
+
+    var paramQualification = [];
+
+    if(parameters.qualification){
+
+        if( Array.isArray(parameters.qualification) ){
+            paramQualification = parameters.qualification;
+        } else{
+            paramQualification = [parameters.qualification];
+        }
+
+        delete parameters.qualification;
+    }
+    console.log(paramQualification);
+
+    // execPopulate() is used for document(record)
+    // exec() is used for query.
+    Job
+        .find(
+            {$and:[
+                parameters,
+                {skillsRequired: {$all: paramSkillsRequired}},
+                {qualification: {$all: paramQualification}},
+                {postedBy: req.college._id }
+            ]}
+        )
+        .then((jobs) => {
+            if(jobs.length === 0){
+                res.send({EmptyError: "No jobs to show."})
+            }
+            res.send(jobs)
+        })
+        .catch((err) => {
+            res.status(400).send(err)
+        }); 
+});
+
 
 module.exports = router;

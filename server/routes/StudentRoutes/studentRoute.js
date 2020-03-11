@@ -9,6 +9,7 @@ const {College} = require('./../../models/collegeModel.js');
 const {Admin} = require('./../../models/adminModel.js');
 const {Event} = require('./../../models/eventModel.js');
 const {Job} = require('./../../models/jobModel.js');
+const {Interview} = require('./../../models/interviewModel.js')
 
 const {studentAuth} = require('../../middleware/studentAuth.js');
 
@@ -129,12 +130,25 @@ router.get('/events', studentAuth, (req, res) => {
         .catch((err) => {
             res.status(400).send(err);
         })
-
 });
+
+
+// For getting full profile of a particular event
+router.get('/events/:id', studentAuth, (req, res) => {
+    var eventId = req.params.id;
+    
+    Event.findById({eventId})
+        .then((event) => {
+            res.send(event)
+        })
+        .catch((err) => {
+            res.status(400).send(err);
+        })
+});
+
 
 router.post('/attend-event/:id', studentAuth, (req, res) =>{
     var eventId = req.params.id;
-    console.log(eventId);
 
     Event.findById(eventId)
         .then((event) => {
@@ -163,7 +177,8 @@ router.post('/attend-event/:id', studentAuth, (req, res) =>{
 // post job
 router.post('/job', studentAuth, (req, res) => {
 
-    req.body.postedBy = req.student._id
+    req.body.postedBy = req.student._id;
+    req.body.collegeId = req.student.collegeId;
     var job = new Job(req.body);
     
     job.save()
@@ -175,21 +190,30 @@ router.post('/job', studentAuth, (req, res) => {
         })
 });
 
+
 router.get('/job', studentAuth, (req, res) => {
 
     let parameters = req.query;
 
-    var paramSkillsRequired = [];
 
-    if(parameters.skillsRequired){
+    function getParamSkillsRequired(){
+        
+        var paramSkillsRequired = [];
 
-        if( Array.isArray(parameters.skillsRequired) ){
-            paramSkillsRequired = parameters.skillsRequired;
-        } else{
-            paramSkillsRequired = [parameters.skillsRequired];
+        if(parameters.skillsRequired){
+
+            if( Array.isArray(parameters.skillsRequired) ){
+                paramSkillsRequired = parameters.skillsRequired;
+            } else{
+                paramSkillsRequired = [parameters.skillsRequired];
+            }
+            delete parameters.skillsRequired;
         }
 
-        delete parameters.skillsRequired;
+        if(paramSkillsRequired.length === 0){
+            return true
+        }
+        return paramSkillsRequired
     }
 
     var paramQualification = [];
@@ -204,7 +228,7 @@ router.get('/job', studentAuth, (req, res) => {
 
         delete parameters.qualification;
     }
-    console.log(paramQualification);
+
 
     // execPopulate() is used for document(record)
     // exec() is used for query.
@@ -212,8 +236,11 @@ router.get('/job', studentAuth, (req, res) => {
         .find(
             {$and:[
                 parameters,
-                {skillsRequired: {$all: paramSkillsRequired}},
-                {qualification: {$all: paramQualification}}
+
+                // {skillsRequired: {$all: true}}
+                // {qualification: {$all: paramQualification}}
+                //,
+// {collegeId : req.student.collegeId}
             ]}
         )
         .then((jobs) => {
@@ -228,18 +255,39 @@ router.get('/job', studentAuth, (req, res) => {
 });
 
 
+router.post('/interview', studentAuth, (req, res) => {
+    req.body.postedBy = req.student._id;
+    req.body.collegeId = req.student.collegeId;
+
+    var interview = new Interview(req.body);
+
+    interview.save()
+        .then(() => {
+            res.send({success : "Interview experience posted successfully."})
+        })
+        .catch((err) => {
+            res.status(400).send(err);
+        });
+});
+
+
+router.get('/interview', (req, res) => {
+
+    var parameters = req.query;
+
+    Interview
+        .find(parameters)
+        .then((interviews) => {
+            res.send(interviews);
+        })
+        .catch((err) => {
+            res.send(err);
+        })
+});
+
+
+
+
 module.exports = router;
-
-
-
-
-
-
-
-
-
-
-
-
 
 
