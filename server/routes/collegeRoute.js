@@ -57,14 +57,11 @@ router.delete('/logout', collegeAuth, (req, res) => {
 });
 
 
-
-
 // get college profile
 // i/p => token
 router.get('/profile', collegeAuth, (req, res) => {
     res.send(req.college);
 })
-
 
 
 /*
@@ -76,6 +73,10 @@ router.get('/profile', collegeAuth, (req, res) => {
  @output: Array (res.body) - list of students
 */
 router.get('/listOfStudents', collegeAuth, (req, res) => {
+
+    var parameters = req.query;
+
+
     Student.find({ collegeName: req.college.collegeName})
         .then((students) => {
             res.send(students)
@@ -121,9 +122,6 @@ router.post('/events', collegeAuth, (req, res) => {
 router.get('/events', collegeAuth, (req, res) => {
     var college = req.college;
 
-    // collegePopulated will return whole college profile with 
-    // the events values fetched from the 'events' database.
-
     // execPopulate() is used for document(record)
     // exec() is used for query.
 
@@ -133,7 +131,9 @@ router.get('/events', collegeAuth, (req, res) => {
             if(err){
                 res.status(400).send(err)
             }
-            // fetching only the events array
+            // 1. collegePopulated will return whole college profile with 
+            // the events values populated from the 'events' database.
+            // 2. fetching only the events array
             // from the whole college profile.
             res.send(collegePopulated.events)
         });
@@ -143,45 +143,29 @@ router.get('/events', collegeAuth, (req, res) => {
 router.get('/job', collegeAuth, (req, res) => {
 
     let parameters = req.query;
-
-    var paramSkillsRequired = [];
-
+        
+    // if skillsRequired in parameters is an array, then
+    // condition is changed to $all
     if(parameters.skillsRequired){
-
         if( Array.isArray(parameters.skillsRequired) ){
             paramSkillsRequired = parameters.skillsRequired;
-        } else{
-            paramSkillsRequired = [parameters.skillsRequired];
-        }
-
-        delete parameters.skillsRequired;
+            parameters["skillsRequired"] = { $all : paramSkillsRequired };
+        }         
     }
 
-    var paramQualification = [];
-
+    // similar to above 
     if(parameters.qualification){
-
         if( Array.isArray(parameters.qualification) ){
             paramQualification = parameters.qualification;
-        } else{
-            paramQualification = [parameters.qualification];
+            parameters["qualification"] = { $all : paramQualification } ;
         }
-
-        delete parameters.qualification;
     }
-    console.log(paramQualification);
+
 
     // execPopulate() is used for document(record)
     // exec() is used for query.
     Job
-        .find(
-            {$and:[
-                parameters,
-                {skillsRequired: {$all: paramSkillsRequired}},
-                {qualification: {$all: paramQualification}},
-                {postedBy: req.college._id }
-            ]}
-        )
+        .find(parameters)
         .then((jobs) => {
             if(jobs.length === 0){
                 res.send({EmptyError: "No jobs to show."})
