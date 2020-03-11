@@ -70,9 +70,10 @@ router.get('/profile', adminAuth, (req, res) => {
 router.get('/listOfStudents', adminAuth, (req, res) => {
     let parameters = req.query;
     console.log(parameters);
+
   
 
-    Student.find({ "skills": "ai", skills:"ds" , "work.company" : "google" })
+    Student.find({  skills : {$all: ["ai", "ml", "ds"]}   })
 
         .then((students) => {
             res.send(students)
@@ -82,7 +83,7 @@ router.get('/listOfStudents', adminAuth, (req, res) => {
         })
 })
 
-
+// skills : {$all: ["ai", "ml", "ds"]}
 
 module.exports = router;
 

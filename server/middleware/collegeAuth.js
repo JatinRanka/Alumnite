@@ -10,7 +10,7 @@ var collegeAuth = (req, res, next) => {
         .then((college) => {
             if(!college) {
                 // console.log("colg not found");
-                reject({msg: "colg not fpund"});
+                reject({msg: "colg not found"});
             }
 
             // console.log(college);

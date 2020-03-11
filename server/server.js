@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 4000;
 // Routes
 const adminRoute = require('./routes/adminRoute');
 const collegeRoute = require('./routes/collegeRoute');
-const studentRoute = require('./routes/studentRoute');
+const studentRoute = require('./routes/StudentRoutes/studentRoute');
 
 
 app.use(bodyParser.json());

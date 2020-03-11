@@ -7,7 +7,7 @@ var studentAuth = (req, res, next) => {
     Student.findByToken(token)
         .then((student) => {
             if(!student) {
-                Promise.reject();
+                reject();
             }
 
             req.student = student;

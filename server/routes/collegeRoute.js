@@ -123,6 +123,10 @@ router.get('/events', collegeAuth, (req, res) => {
 
     // collegePopulated will return whole college profile with 
     // the events values fetched from the 'events' database.
+
+    // execPopulate() is used for document(record)
+    // exec() is used for query.
+
     college
         .populate('events')
         .execPopulate(function (err, collegePopulated){

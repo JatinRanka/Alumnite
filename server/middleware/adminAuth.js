@@ -7,7 +7,8 @@ var adminAuth = (req, res, next) => {
     Admin.findByToken(token)
         .then((admin) => {
             if(!admin) {
-                Promise.reject();
+                console.log("hi");
+                reject({msg: "admin not fpund"});
             }
 
             req.admin = admin;

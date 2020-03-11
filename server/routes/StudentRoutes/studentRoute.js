@@ -4,12 +4,13 @@ const router = express.Router();
 const _ = require('lodash');
 
 
-const {Student} = require('./../models/studentModel');
-const {College} = require('./../models/collegeModel.js');
-const {Admin} = require('./../models/adminModel.js');
-const {Event} = require('./../models/eventModel.js');
+const {Student} = require('./../../models/studentModel');
+const {College} = require('./../../models/collegeModel.js');
+const {Admin} = require('./../../models/adminModel.js');
+const {Event} = require('./../../models/eventModel.js');
+const {Job} = require('./../../models/jobModel.js');
 
-const {studentAuth} = require('../middleware/studentAuth.js');
+const {studentAuth} = require('../../middleware/studentAuth.js');
 
 // dummy update for test
 // router.post('/test',studentAuth, (req, res) => {
@@ -156,6 +157,74 @@ router.post('/attend-event/:id', studentAuth, (req, res) =>{
         .catch((err) => {
             res.status(400).send(err)
         });
+});
+
+
+// post job
+router.post('/job', studentAuth, (req, res) => {
+
+    req.body.postedBy = req.student._id
+    var job = new Job(req.body);
+    
+    job.save()
+        .then(() => {
+            res.send({success : "job posted successfully"})
+        })
+        .catch((err) => {
+            res.status(400).send(err);
+        })
+});
+
+router.get('/job', studentAuth, (req, res) => {
+
+    let parameters = req.query;
+
+    var paramSkillsRequired = [];
+
+    if(parameters.skillsRequired){
+
+        if( Array.isArray(parameters.skillsRequired) ){
+            paramSkillsRequired = parameters.skillsRequired;
+        } else{
+            paramSkillsRequired = [parameters.skillsRequired];
+        }
+
+        delete parameters.skillsRequired;
+    }
+
+    var paramQualification = [];
+
+    if(parameters.qualification){
+
+        if( Array.isArray(parameters.qualification) ){
+            paramQualification = parameters.qualification;
+        } else{
+            paramQualification = [parameters.qualification];
+        }
+
+        delete parameters.qualification;
+    }
+    console.log(paramQualification);
+
+    // execPopulate() is used for document(record)
+    // exec() is used for query.
+    Job
+        .find(
+            {$and:[
+                parameters,
+                {skillsRequired: {$all: paramSkillsRequired}},
+                {qualification: {$all: paramQualification}}
+            ]}
+        )
+        .then((jobs) => {
+            if(jobs.length === 0){
+                res.send({EmptyError: "No jobs to show."})
+            }
+            res.send(jobs)
+        })
+        .catch((err) => {
+            res.status(400).send(err)
+        }); 
 });
 
 
