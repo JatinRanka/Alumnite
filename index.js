@@ -3,19 +3,23 @@ const app = express();
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const mongoose = require('mongoose');
+
+require('dotenv').config()
+
+
 const PORT = process.env.PORT || 4000;
 
 
 // Routes
-const adminRoute = require('./routes/adminRoute');
-const collegeRoute = require('./routes/collegeRoute');
-const studentRoute = require('./routes/StudentRoutes/studentRoute');
+const adminRoute = require('./server/routes/adminRoute.js');
+const collegeRoute = require('./server/routes/collegeRoute');
+const studentRoute = require('./server/routes/StudentRoutes/studentRoute');
 
 
 app.use(bodyParser.json());
 app.use(cors());
 
-mongoose.connect('mongodb://127.0.0.1:27017/AlumniTrackingSystem', {useNewUrlParser : true, autoIndex: true});
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/AlumniTrackingSystem', {useNewUrlParser : true, autoIndex: true});
 const connection = mongoose.connection;
 
 app.get('/', (req, res) => {
