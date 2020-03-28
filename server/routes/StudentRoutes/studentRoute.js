@@ -123,7 +123,7 @@ router.post('/fill-profile', studentAuth, (req, res) => {
 router.get('/events', studentAuth, (req, res) => {
     
     // returns only the events organised by student's college
-    Event.find({organisedBy : req.student.collegeId})
+    Event.find({organiserId : req.student.collegeId})
         .then((events) => {
             res.send(events)
         })
@@ -137,7 +137,10 @@ router.get('/events', studentAuth, (req, res) => {
 router.get('/events/:id', studentAuth, (req, res) => {
     var eventId = req.params.id;
     
-    Event.findById({eventId})
+    Event.find({
+        _id: eventId,
+        organiserId: req.student.collegeId
+    })
         .then((event) => {
             res.send(event)
         })
@@ -194,7 +197,10 @@ router.post('/job', studentAuth, (req, res) => {
 router.get('/job', studentAuth, (req, res) => {
 
     let parameters = req.query;
+
+    parameters.collegeId = req.student.collegeId;
         
+
     // if skillsRequired in parameters is an array, then
     // condition is changed to $all
     if(parameters.skillsRequired){
@@ -248,6 +254,7 @@ router.post('/interview', studentAuth, (req, res) => {
 router.get('/interview', (req, res) => {
 
     var parameters = req.query;
+    parameters.collegeId = req.student.collegeId;
 
     Interview
         .find(parameters)
@@ -258,7 +265,6 @@ router.get('/interview', (req, res) => {
             res.send(err);
         })
 });
-
 
 
 

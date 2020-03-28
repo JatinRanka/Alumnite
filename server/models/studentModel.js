@@ -22,8 +22,14 @@ const StudentSchema = new mongoose.Schema({
         ref: 'College',
         required: true
     },
+    passOutBatch: {
+        type: Number,
+        required: true
+    },
+
     studentName: {
-        type: String
+        type: String,
+        lowercase: true
     },
     verified: {
         type: Boolean
@@ -70,10 +76,6 @@ const StudentSchema = new mongoose.Schema({
     },
 
     location: {
-        type: String
-    },
-
-    passOutBatch: {
         type: String
     },
 

@@ -20,7 +20,7 @@ const connection = mongoose.connection;
 
 app.get('/', (req, res) => {
     console.log("hello world");
-    res.send("Hello world")
+    res.send("Server is up and running.")
 })
 
 app.use('/admin', adminRoute);

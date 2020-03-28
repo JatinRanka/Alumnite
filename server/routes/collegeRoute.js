@@ -75,9 +75,9 @@ router.get('/profile', collegeAuth, (req, res) => {
 router.get('/listOfStudents', collegeAuth, (req, res) => {
 
     var parameters = req.query;
+    parameters.collegeId = req.college._id;
 
-
-    Student.find({ collegeName: req.college.collegeName})
+    Student.find(parameters)
         .then((students) => {
             res.send(students)
         })
@@ -99,7 +99,8 @@ router.post('/events', collegeAuth, (req, res) => {
         date: new Date(req.body.date),
         venue: req.body.venue,
         decription: req.body.decription,
-        organisedBy: college._id
+        organiserId: college._id,
+        organiserType: "college"
     });
     
     event.save()

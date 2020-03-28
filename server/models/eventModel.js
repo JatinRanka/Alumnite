@@ -15,10 +15,14 @@ const EventSchema = new mongoose.Schema({
     decription: {
         type: String
     },
-    organisedBy: {
+    organiserId: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
         ref: 'College'
+    },
+    organiserType: {
+        type: String,
+        required: true,
     },
     attendees: [
         {
