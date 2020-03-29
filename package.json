@@ -1,7 +1,6 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
@@ -18,7 +17,18 @@
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.15",
+    "mongodb": "^3.5.5",
     "mongoose": "^5.8.4",
     "now": "^17.1.1"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JatinRanka/alumni-management-system.git"
+  },
+  "bugs": {
+    "url": "https://github.com/JatinRanka/alumni-management-system/issues"
+  },
+  "homepage": "https://github.com/JatinRanka/alumni-management-system#readme",
+  "description": ""
 }
