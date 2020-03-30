@@ -7,9 +7,9 @@
     },
     "routes": [
       {
-        "src": "/users",
+        "src": "/",
         "dest": "/index.js",
-        "methods": ["GET"]
+        "methods": ["GET", "POST"]
       }
     ]
   }
