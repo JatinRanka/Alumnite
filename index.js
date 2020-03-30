@@ -20,7 +20,7 @@ app.use(bodyParser.json());
 app.use(cors());
 
 //process.env.MONGODB_URI
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/AlumniTrackingSystem', {useNewUrlParser : true, autoIndex: true});
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/AlumniTrackingSystem', {useMongoClient: true, useNewUrlParser : true, autoIndex: true});
 const connection = mongoose.connection;
 
 app.get('/', (req, res) => {
