@@ -6,6 +6,7 @@ const _ = require('lodash');
 
 const {College} = require('./../models/collegeModel');
 const {Student} = require('./../models/studentModel');
+const {Alumni} = require('./../models/adminModel.js');
 const {Admin} = require('./../models/adminModel.js');
 
 // MiddleWare
@@ -18,11 +19,26 @@ router.post('/add', (req, res) => {
 
     admin.save()
         .then(() => {
-            res.send("success")
+            res.send({msg: 'admin added successfully.'})
         })
         .catch((err) => {
             res.status(400).send(err)
         })
+});
+
+// register new college
+router.post('/college', adminAuth, (req, res) => {
+    req.body.adminId = req.admin._id;
+    // console.log(req.admin._id);
+    var college = new College(req.body);
+
+    college.save()
+        .then((college) => {
+            res.send({msg: 'College added successfully.', college});
+        })
+        .catch((err) => {
+            res.status(400).send({err});
+        });
 });
 
 // Login
@@ -65,17 +81,17 @@ router.get('/profile', adminAuth, (req, res) => {
 })
 
 
-// get all students
-router.get('/listOfStudents', adminAuth, (req, res) => {
+// get all alumni
+router.get('/listOfAlumni', adminAuth, (req, res) => {
     let parameters = req.query;
     console.log(parameters);
 
   
 
-    Student.find({  skills : {$all: ["ai", "ml", "ds"]}   })
+    Alumni.find({  skills : {$all: ["ai", "ml", "ds"]}   })
 
-        .then((students) => {
-            res.send(students)
+        .then((alumni) => {
+            res.send(alumni)
         })
         .catch((err) => {
             res.status(400).send(err);

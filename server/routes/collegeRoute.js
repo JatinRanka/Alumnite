@@ -3,6 +3,7 @@ const router = express.Router();
 
 const _ = require('lodash');
 
+const {Alumni} = require('./../models/alumniModel.js')
 const {College} = require('./../models/collegeModel');
 const {Student} = require('./../models/studentModel');
 const {Event} = require('./../models/eventModel.js')
@@ -31,13 +32,12 @@ router.post('/login', (req, res) => {
     College.findOne({email, password})
         .then((college) => {
             if(!college) {
-                return res.status(404).json({emailerror: "College not found with this email"})
+                return res.status(404).json({err: "Check email/password"})
             }
-
-            return college.generateAuthToken();
-        })
-        .then((token) => {
-            res.status(200).header('x-auth', token).send("login successful");
+            return college.generateAuthToken()
+            .then((token) => {
+                res.status(200).header('x-auth', token).send({user: college});
+            });
         })
         .catch((err) => {
             res.status(400).send(err);
@@ -66,20 +66,20 @@ router.get('/profile', collegeAuth, (req, res) => {
 
 /*
  @Type: POST
- @Route: /listOfStudents
- @Desc: For getting list of students from 
+ @Route: /listOfalumni
+ @Desc: For getting list of alumni from 
         the particular college
  @input: token in header
- @output: Array (res.body) - list of students
+ @output: Array (res.body) - list of alumni
 */
-router.get('/listOfStudents', collegeAuth, (req, res) => {
+router.get('/listOfAlumni', collegeAuth, (req, res) => {
 
     var parameters = req.query;
     parameters.collegeId = req.college._id;
 
-    Student.find(parameters)
-        .then((students) => {
-            res.send(students)
+    Alumni.find(parameters)
+        .then((alumni) => {
+            res.send(alumni)
         })
         .catch((err) => {
             res.status(200).send(err)

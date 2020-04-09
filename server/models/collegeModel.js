@@ -6,6 +6,7 @@ const bcrypt = require('bcryptjs');
 const CollegeSchema = new mongoose.Schema({
     email: {
         type: String,
+        unique: true,
         required: true
     },
     password: {
@@ -14,6 +15,11 @@ const CollegeSchema = new mongoose.Schema({
     },
     collegeName: {
         type: String,
+        required: true
+    },
+    adminId:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Admin',
         required: true
     },
     tokens: [{

@@ -8,7 +8,7 @@ var adminAuth = (req, res, next) => {
         .then((admin) => {
             if(!admin) {
                 console.log("hi");
-                reject({msg: "admin not fpund"});
+                reject({msg: "admin not found"});
             }
 
             req.admin = admin;

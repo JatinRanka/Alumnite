@@ -4,27 +4,12 @@ const router = express.Router();
 const _ = require('lodash');
 
 
-const {Student} = require('../../models/alumniModel');
-const {College} = require('./../../models/collegeModel.js');
-const {Admin} = require('./../../models/adminModel.js');
+const {Alumni} = require('./../../models/alumniModel.js');
 const {Event} = require('./../../models/eventModel.js');
 const {Job} = require('./../../models/jobModel.js');
 const {Interview} = require('./../../models/interviewModel.js')
 
-const {studentAuth} = require('../../middleware/studentAuth.js');
-
-// dummy update for test
-// router.post('/test',studentAuth, (req, res) => {
-//     var student = req.student;
-
-//     student.update({collegeId : req.body.collegeId})
-//         .then(() => {
-//             res.send("successfuly updtaed")
-//         })
-//         .catch((err) => {
-//             res.status(400).send(err)
-//         })
-// })
+const {alumniAuth} = require('../../middleware/alumniAuth.js');
 
 
 /*
@@ -33,16 +18,17 @@ const {studentAuth} = require('../../middleware/studentAuth.js');
  @Desc: Sign-up
 */
 router.post('/register', (req, res) => {
+    // console.log('in alumni');
+    var alumni = new Alumni(req.body);
 
-    var student = new Student(req.body)
-
-    student.save().then(() => {
-        return student.generateAuthToken();
-    }).then((token) => {
-        res.header('x-auth', token).send(student);
-    }).catch((err) => {
-        res.status(400).send(err);
-    });
+    alumni.save()
+        .then(() => {
+            return alumni.generateAuthToken();
+        }).then((token) => {
+            res.header('x-auth', token).send(alumni);
+        }).catch((err) => {
+            res.status(400).send(err);
+        });
 
 });
 
@@ -52,15 +38,15 @@ router.post('/login', (req, res) => {
     
     var {email, password} = _.pick(req.body, ['email', 'password']);
 
-    Student.findOne({email, password}) 
-        .then((student) => {
-            if(!student) {
-                reject();
+    Alumni.findOne({email, password}) 
+        .then((alumni) => {
+            if(!alumni) {
+                res.status(404).send({err: 'Check email/password.'});
             }
-            return student.generateAuthToken()    
-        })
-        .then((token) => {
-            res.status(200).header('x-auth', token).send({success: true, student});
+            return alumni.generateAuthToken()    
+                .then((token) => {
+                    res.status(200).header('x-auth', token).send({user:alumni});
+                })
         })
         .catch((err) => {
             res.status(400).send(err)
@@ -69,35 +55,35 @@ router.post('/login', (req, res) => {
 
 
 // me
-router.get('/profile', studentAuth ,(req, res) => {
-    res.send(req.student);
+router.get('/profile', alumniAuth ,(req, res) => {
+    res.send(req.alumni);
 })
 
 
 //logout
-router.delete('/logout', studentAuth, (req, res) => {
-    req.student.removeToken(req.token)
+router.delete('/logout', alumniAuth, (req, res) => {
+    req.alumni.removeToken(req.token)
         .then(() => {
-            res.status(200).send();
+            res.status(200).send({msg: 'Logout Success'});
         })
         .catch((err) => {
-            res.status(400).send();
+            res.status(400).send(err);
         });
 });
 
 
 // Fill profile
-router.post('/fill-profile', studentAuth, (req, res) => {
+router.post('/fill-profile', alumniAuth, (req, res) => {
     var {education, work, mobileNumber, location} = _.pick(req.body, ['education', 'work', 'mobileNumber', 'location']);
 
-    var student = req.student;
+    var alumni = req.alumni;
     
-    student.education = education;
-    student.work = work;
-    student.mobileNumber = mobileNumber;
-    student.location = location;
+    alumni.education = education;
+    alumni.work = work;
+    alumni.mobileNumber = mobileNumber;
+    alumni.location = location;
 
-    student.save()
+    alumni.save()
         .then(() => {
             res.send("success");
         })
@@ -108,10 +94,10 @@ router.post('/fill-profile', studentAuth, (req, res) => {
 
 
 // Get list of events
-router.get('/events', studentAuth, (req, res) => {
+router.get('/events', alumniAuth, (req, res) => {
     
-    // returns only the events organised by student's college
-    Event.find({organiserId : req.student.collegeId})
+    // returns only the events organised by alumni's college
+    Event.find({organiserId : req.alumni.collegeId})
         .then((events) => {
             res.send(events)
         })
@@ -122,12 +108,12 @@ router.get('/events', studentAuth, (req, res) => {
 
 
 // For getting full profile of a particular event
-router.get('/events/:id', studentAuth, (req, res) => {
+router.get('/events/:id', alumniAuth, (req, res) => {
     var eventId = req.params.id;
     
     Event.find({
         _id: eventId,
-        organiserId: req.student.collegeId
+        organiserId: req.alumni.collegeId
     })
         .then((event) => {
             res.send(event)
@@ -138,7 +124,7 @@ router.get('/events/:id', studentAuth, (req, res) => {
 });
 
 
-router.post('/attend-event/:id', studentAuth, (req, res) =>{
+router.post('/attend-event/:id', alumniAuth, (req, res) =>{
     var eventId = req.params.id;
 
     Event.findById(eventId)
@@ -146,11 +132,11 @@ router.post('/attend-event/:id', studentAuth, (req, res) =>{
 
             // if event doesn't exist
             if(!event) {
-                res.status(404).json({NullEventError : "Event doesn't exist."})
+                res.status(404).json({err : "Event doesn't exist."})
             }
 
             // adds user to the list of event attendees
-            event.attendees.push(req.student)
+            event.attendees.push(req.alumni)
             event.save()
                 .then(() => {
                     res.send({success : "event registration success"});
@@ -166,10 +152,10 @@ router.post('/attend-event/:id', studentAuth, (req, res) =>{
 
 
 // post job
-router.post('/job', studentAuth, (req, res) => {
+router.post('/job', alumniAuth, (req, res) => {
 
-    req.body.postedBy = req.student._id;
-    req.body.collegeId = req.student.collegeId;
+    req.body.postedBy = req.alumni._id;
+    req.body.collegeId = req.alumni.collegeId;
     var job = new Job(req.body);
     
     job.save()
@@ -182,11 +168,11 @@ router.post('/job', studentAuth, (req, res) => {
 });
 
 
-router.get('/job', studentAuth, (req, res) => {
+router.get('/job', alumniAuth, (req, res) => {
 
     let parameters = req.query;
 
-    parameters.collegeId = req.student.collegeId;
+    parameters.collegeId = req.alumni.collegeId;
         
 
     // if skillsRequired in parameters is an array, then
@@ -223,9 +209,9 @@ router.get('/job', studentAuth, (req, res) => {
 });
 
 
-router.post('/interview', studentAuth, (req, res) => {
-    req.body.postedBy = req.student._id;
-    req.body.collegeId = req.student.collegeId;
+router.post('/interview', alumniAuth, (req, res) => {
+    req.body.postedBy = req.alumni._id;
+    req.body.collegeId = req.alumni.collegeId;
 
     var interview = new Interview(req.body);
 
@@ -242,7 +228,7 @@ router.post('/interview', studentAuth, (req, res) => {
 router.get('/interview', (req, res) => {
 
     var parameters = req.query;
-    parameters.collegeId = req.student.collegeId;
+    parameters.collegeId = req.alumni.collegeId;
 
     Interview
         .find(parameters)
@@ -257,5 +243,3 @@ router.get('/interview', (req, res) => {
 
 
 module.exports = router;
-
-
