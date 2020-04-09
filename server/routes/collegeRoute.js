@@ -11,6 +11,19 @@ const {Event} = require('./../models/eventModel.js')
 const {collegeAuth} = require('./../middleware/collegeAuth');
 
 
+// Get list of all colleges
+router.get('/', (req, res) => {
+    College.find()
+        .then((colleges) => {
+            res.send(colleges)
+        })
+        .catch((err) => {
+            res.status(400).send(err);
+        })
+})
+
+
+
 // register new college
 router.post('/add', (req, res) => {
     var college = new College(req.body);
