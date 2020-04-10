@@ -111,7 +111,7 @@ router.get('/events', alumniAuth, (req, res) => {
 router.get('/events/:id', alumniAuth, (req, res) => {
     var eventId = req.params.id;
     
-    Event.find({
+    Event.findOne({
         _id: eventId,
         organiserId: req.alumni.collegeId
     })
@@ -124,10 +124,13 @@ router.get('/events/:id', alumniAuth, (req, res) => {
 });
 
 
-router.post('/attend-event/:id', alumniAuth, (req, res) =>{
+router.post('/events/attend/:id', alumniAuth, (req, res) =>{
     var eventId = req.params.id;
 
-    Event.findById(eventId)
+    Event.findOne({
+        _id: eventId,
+        organiserId: req.alumni.collegeId
+    })
         .then((event) => {
 
             // if event doesn't exist

@@ -121,7 +121,7 @@ router.post('/events', collegeAuth, (req, res) => {
             college.events.push(event) ;
             college.save()
                 .then(() => {
-                    res.send("event posted successfully.");
+                    res.send({event});
                 })
                 .catch((err) => {
                     res.status(400).send(err);

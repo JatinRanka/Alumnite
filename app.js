@@ -4,8 +4,12 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const mongoose = require('mongoose');
 
+const expressOasGenerator = require('express-oas-generator');
+
+
 require('dotenv').config()
 
+expressOasGenerator.init(app, {});
 
 const PORT = process.env.PORT || 4000;
 
