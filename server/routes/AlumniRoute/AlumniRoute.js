@@ -218,7 +218,7 @@ router.get('/jobs', alumniAuth, (req, res) => {
 });
 
 
-router.post('/interview', alumniAuth, (req, res) => {
+router.post('/interviews', alumniAuth, (req, res) => {
     req.body.postedBy = req.alumni._id;
     req.body.collegeId = req.alumni.collegeId;
 
@@ -234,7 +234,7 @@ router.post('/interview', alumniAuth, (req, res) => {
 });
 
 
-router.get('/interview', (req, res) => {
+router.get('/interviews', (req, res) => {
 
     var parameters = req.query;
     parameters.collegeId = req.alumni.collegeId;
