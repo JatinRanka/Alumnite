@@ -161,7 +161,7 @@ router.post('/events/attend/:id', alumniAuth, (req, res) =>{
 
 
 // post job
-router.post('/job', alumniAuth, (req, res) => {
+router.post('/jobs', alumniAuth, (req, res) => {
 
     req.body.postedBy = req.alumni._id;
     req.body.collegeId = req.alumni.collegeId;
@@ -177,7 +177,7 @@ router.post('/job', alumniAuth, (req, res) => {
 });
 
 
-router.get('/job', alumniAuth, (req, res) => {
+router.get('/jobs', alumniAuth, (req, res) => {
 
     let parameters = req.query;
 
