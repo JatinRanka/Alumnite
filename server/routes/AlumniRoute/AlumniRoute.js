@@ -103,7 +103,7 @@ router.get('/events', alumniAuth, (req, res) => {
         })
         .catch((err) => {
             res.status(400).send(err);
-        })
+        });
 });
 
 
@@ -114,13 +114,19 @@ router.get('/events/:id', alumniAuth, (req, res) => {
     Event.findOne({
         _id: eventId,
         organiserId: req.alumni.collegeId
-    })
+        })
         .then((event) => {
-            res.send(event)
+            event.populate('attendees', ['firstName'])
+                .execPopulate(function (err, event){
+                    if(err){
+                        res.status(400).send(err);
+                    }
+                    res.send({event})
+                });
         })
         .catch((err) => {
             res.status(400).send(err);
-        })
+        });
 });
 
 
@@ -163,11 +169,11 @@ router.post('/job', alumniAuth, (req, res) => {
     
     job.save()
         .then(() => {
-            res.send({success : "job posted successfully"})
+            res.send({success : "job posted successfully", job})
         })
         .catch((err) => {
             res.status(400).send(err);
-        })
+        });
 });
 
 
