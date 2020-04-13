@@ -60,6 +60,21 @@ router.get('/profile', alumniAuth ,(req, res) => {
 })
 
 
+router.patch('/profile', alumniAuth, (req, res) => {
+    console.log(req.alumni);
+
+    var alumni = req.alumni;
+
+    Alumni.findByIdAndUpdate({_id: alumni._id}, {$set: req.body}, function(err, result){
+        if(err){
+            res.status(400).send(err);
+        }
+        res.send(result)
+    })
+
+
+})
+
 //logout
 router.delete('/logout', alumniAuth, (req, res) => {
     req.alumni.removeToken(req.token)
@@ -169,7 +184,7 @@ router.post('/jobs', alumniAuth, (req, res) => {
     
     job.save()
         .then(() => {
-            res.send({success : "job posted successfully", job})
+            res.send({success: "job posted successfully", job})
         })
         .catch((err) => {
             res.status(400).send(err);
@@ -177,12 +192,30 @@ router.post('/jobs', alumniAuth, (req, res) => {
 });
 
 
+router.get('/testJob', alumniAuth, (req, res) => {
+    
+    // var params = 
+    var param = req.query;
+    console.log(param);
+
+    Job.find(
+        {skillsRequired:{ $in: [] }   }
+    )
+        .then((jobs) => {
+            res.send(jobs)
+        })
+        .catch((err) => {
+            res.status(400).send(err);
+        })
+})
+
+
 router.get('/jobs', alumniAuth, (req, res) => {
 
     let parameters = req.query;
 
     parameters.collegeId = req.alumni.collegeId;
-        
+    console.log(parameters);
 
     // if skillsRequired in parameters is an array, then
     // condition is changed to $all
@@ -200,6 +233,7 @@ router.get('/jobs', alumniAuth, (req, res) => {
             parameters["qualification"] = { $all : paramQualification } ;
         }
     }
+
 
 
     // execPopulate() is used for document(record)

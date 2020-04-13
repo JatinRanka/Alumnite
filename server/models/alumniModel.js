@@ -27,7 +27,11 @@ const AlumniSchema = new mongoose.Schema({
         ref: 'Admin',
         required: true
     },
-    passOutBatch: {
+    startYear:{
+        type: Number,
+        required: true
+    },
+    endYear: {
         type: Number,
         required: true
     },
@@ -59,22 +63,38 @@ const AlumniSchema = new mongoose.Schema({
 
     education: [
         {
-            period: {
-                type: String
+            startYear: {
+                type: Number
             },
+            endYear: {
+                type: Number
+            },
+
             school: {
                 type: String
             }
         }
     ],
 
-    currentlyWorkingAtIndustry:{
-        type:String
-    },
-
-    workedAtIndustries: [],
-    
-    designations: [],
+    work: [
+        {
+            startYear: {
+                type: Number
+            },
+            endYear: {
+                type: Number
+            },
+            company: {
+                type: String
+            },
+            workTitle: {
+                type: String
+            },
+            industry: {
+                type: String
+            }
+        }
+    ],
 
     mobileNumber: {
         type: String
@@ -84,8 +104,9 @@ const AlumniSchema = new mongoose.Schema({
         type: String
     },
 
-    skills: []
-
+    skills: [{
+        type: String
+    }]
 });
 
 
