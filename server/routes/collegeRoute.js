@@ -104,18 +104,19 @@ router.get('/listOfAlumni', collegeAuth, (req, res) => {
 router.post('/events', collegeAuth, (req, res) => {
 
     var college = req.college;
-    // var time = moment.tz('Asia/Calcutta').format("YYYY-MM-DDTHH:MM:ss");
 
-    var event = new Event({
-        name: req.body.name,
-        //format MM-DD-YYYY
-        date: new Date(req.body.date),
-        venue: req.body.venue,
-        decription: req.body.decription,
-        organiserId: college._id,
-        organiserType: "college"
-    });
-    
+    var data = _.pick(req.body, ['title', 'subtitle', 'description', 'venue', 'location', 'endYear', 'sendMail', 'time'])
+
+    data.organiserId = college._id;
+    data.organiserType = 'college';
+
+    var date = req.body.date.split('-');
+    var date = new Date(date[0], date[1]-1, date[2]);
+    // console.log(date);
+
+    data.date = date;
+
+    var event = new Event(data);
     event.save()
         .then(() => {
             college.events.push(event) ;

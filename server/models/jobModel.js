@@ -5,7 +5,7 @@ const JobSchema = new mongoose.Schema({
     // Alumni Id
     postedBy: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Student',
+        ref: 'Alumni',
         required: true
     },
     // College Id
@@ -19,9 +19,12 @@ const JobSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    designation: {
+    workTitle: {
         type: String,
         required: true
+    },
+    industry: {
+        type: String
     },
     // full-time / intern / part-time
     typeOfJob: {

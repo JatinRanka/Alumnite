@@ -2,10 +2,14 @@ const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
+// var {trimmedString} = require('./../utils/util.js');
+
+var trimmedString = {type:String, trim:true}
 
 const AlumniSchema = new mongoose.Schema({
     email: {
         type: String,
+        trim: true,
         required: true,
         unique: true
     },
@@ -15,6 +19,7 @@ const AlumniSchema = new mongoose.Schema({
     },
     collegeName: {
         type: String,
+        trim: true,
         required: true
     },
     collegeId : {
@@ -35,7 +40,18 @@ const AlumniSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-
+    degree: {
+        type: String,
+        required: true
+    },
+    branch: {
+        type: String,
+        required: true
+    },
+    rollNumber: {
+        type: String,
+        required: true
+    },
     firstName: {
         type: String,
         required: true
@@ -46,7 +62,6 @@ const AlumniSchema = new mongoose.Schema({
 
     verified: {
         type: Boolean,
-        // required: true,
         default: false
     },
 
@@ -64,48 +79,87 @@ const AlumniSchema = new mongoose.Schema({
     education: [
         {
             startYear: {
-                type: Number
+                type: String,
+                trim: true
             },
             endYear: {
-                type: Number
+                type: String,
+                trim: true
             },
-
+            course: {
+                type: String,
+                trim: true
+            },
             school: {
-                type: String
+                type: String,
+                trim: true
             }
         }
     ],
 
-    work: [
+    workExperiences: [
         {
             startYear: {
-                type: Number
+                type: String
             },
             endYear: {
-                type: Number
+                type: String
             },
             company: {
-                type: String
+                type: String,
+                trim: true
             },
             workTitle: {
-                type: String
+                type: String,
+                trim: true
             },
             industry: {
-                type: String
+                type: String,
+                trim: true
             }
         }
     ],
 
     mobileNumber: {
-        type: String
+        type: Number
     },
 
     location: {
+        city: {
+            type: String,
+            trim: true
+        },
+        state: {
+            type: String,
+            trim: true
+        },
+        country: {
+            type: String,
+            trim: true
+        },
+        coordinates:{
+            langitude: {
+                type: String
+            },
+            latitude:{
+                type: String
+            }
+        }
+    },
+    socialProfiles: {
+        facebook: {
+            type: String
+        },
+        linkedin: {
+            type: String
+        }
+    },
+    imageUrl: {
         type: String
     },
-
     skills: [{
-        type: String
+        type: String,
+        trim: true
     }]
 });
 

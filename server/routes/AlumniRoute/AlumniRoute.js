@@ -18,8 +18,15 @@ const {alumniAuth} = require('../../middleware/alumniAuth.js');
  @Desc: Sign-up
 */
 router.post('/register', (req, res) => {
-    // console.log('in alumni');
+
     var alumni = new Alumni(req.body);
+
+    alumni.education.push({
+        "startYear": alumni.startYear.toString(),
+        "endYear": alumni.endYear.toString(),
+        "course": alumni.degree,
+        "school": alumni.collegeName
+    });
 
     alumni.save()
         .then(() => {
@@ -112,7 +119,10 @@ router.post('/fill-profile', alumniAuth, (req, res) => {
 router.get('/events', alumniAuth, (req, res) => {
     
     // returns only the events organised by alumni's college
-    Event.find({organiserId : req.alumni.collegeId})
+    Event.find({
+        organiserId : req.alumni.collegeId,
+        date: { $gte : new Date()}
+    })
         .then((events) => {
             res.send(events)
         })
