@@ -15,7 +15,7 @@ const InterviewSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    designation: {
+    workTitle: {
         type: String,
         required: true
     },
@@ -23,17 +23,23 @@ const InterviewSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    // easy, medium, hard
+    
     difficulty: {
-        type: String,
-        required: true
+        type: Number,
+        required: true,
+        min: 1,
+        max: 5
     },
     description: {
         type: String,
         required: true
     },
-    // topics to focus on
-    topics: [],
+    topics: [{
+        type: String
+    }],
+    keywords: [{
+        type: String
+    }],
     feedback: {
         type: String
     }

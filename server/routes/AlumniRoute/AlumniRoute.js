@@ -227,9 +227,19 @@ router.post('/interviews', alumniAuth, (req, res) => {
 
     var interview = new Interview(req.body);
 
+    var keywords = [];
+    keywords = keywords.concat(
+        interview.company, 
+        interview.workTitle,
+        interview.industry,
+        interview.topics
+        );
+
+    interview.keywords = keywords;
+    
     interview.save()
         .then(() => {
-            res.send({success : "Interview experience posted successfully."})
+            res.send(interview);
         })
         .catch((err) => {
             res.status(400).send(err);
@@ -237,13 +247,12 @@ router.post('/interviews', alumniAuth, (req, res) => {
 });
 
 
-router.get('/interviews', (req, res) => {
-
-    var parameters = req.query;
-    parameters.collegeId = req.alumni.collegeId;
-
+router.get('/interviews', alumniAuth, (req, res) => {
+    
     Interview
-        .find(parameters)
+        .find({
+            collegeId: req.alumni.collegeId
+        })
         .then((interviews) => {
             res.send(interviews);
         })
