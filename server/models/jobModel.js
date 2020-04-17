@@ -32,12 +32,22 @@ const JobSchema = new mongoose.Schema({
         enum: ['full-time', 'intern', 'part-time'],
         required: true
     },
-    location:{
-        type: String,
-        required: true
+    location: {
+        city: {
+            type: String,
+            trim: true
+        },
+        state: {
+            type: String,
+            trim: true
+        },
+        country: {
+            type: String,
+            trim: true
+        }
     },
     salaryOffered:{
-        type: Number
+        type: String
     },
     experience:{
         // minimum Number of experience required (in yrs)
@@ -46,16 +56,18 @@ const JobSchema = new mongoose.Schema({
     description:{
         type: String
     },
-    skillsRequired: {
-        type: Array,
-        required: true,
-        default: []
+    skillsRequired: [{
+        type: String
+    }],
+    qualification: [{
+        type: String
+    }],
+    contactInfo: {
+        type: String
     },
-    qualification: {
-        type: Array,
-        required: true,
-        default: []
-    }
+    keywords: [{
+        type: String
+    }]
 }); 
 
 

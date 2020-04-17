@@ -1,3 +1,5 @@
-const date = new Date(2020, 05, 10, 10, 33);
+var keyy = [];
 
-console.log(date);
+keyy = keyy.concat(['a', 'b'], 'c');
+
+console.log(keyy);

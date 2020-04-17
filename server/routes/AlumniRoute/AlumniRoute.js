@@ -191,7 +191,11 @@ router.post('/jobs', alumniAuth, (req, res) => {
     req.body.postedBy = req.alumni._id;
     req.body.collegeId = req.alumni.collegeId;
     var job = new Job(req.body);
-    
+
+    var keywords = [];
+    keywords = keywords.concat(job.skillsRequired, job.qualification, job.company, job.industry, job.workTitle, job.typeOfJob);
+    job.keywords = keywords;
+
     job.save()
         .then(() => {
             res.send({success: "job posted successfully", job})
@@ -202,59 +206,14 @@ router.post('/jobs', alumniAuth, (req, res) => {
 });
 
 
-router.get('/testJob', alumniAuth, (req, res) => {
-    
-    // var params = 
-    var param = req.query;
-    console.log(param);
-
-    Job.find(
-        {skillsRequired:{ $in: [] }   }
-    )
-        .then((jobs) => {
-            res.send(jobs)
-        })
-        .catch((err) => {
-            res.status(400).send(err);
-        })
-})
-
-
 router.get('/jobs', alumniAuth, (req, res) => {
 
-    let parameters = req.query;
-
-    parameters.collegeId = req.alumni.collegeId;
-    console.log(parameters);
-
-    // if skillsRequired in parameters is an array, then
-    // condition is changed to $all
-    if(parameters.skillsRequired){
-        if( Array.isArray(parameters.skillsRequired) ){
-            paramSkillsRequired = parameters.skillsRequired;
-            parameters["skillsRequired"] = { $all : paramSkillsRequired };
-        }         
-    }
-
-    // similar to above 
-    if(parameters.qualification){
-        if( Array.isArray(parameters.qualification) ){
-            paramQualification = parameters.qualification;
-            parameters["qualification"] = { $all : paramQualification } ;
-        }
-    }
-
-
-
-    // execPopulate() is used for document(record)
-    // exec() is used for query.
     Job
-        .find(parameters)
+        .find({
+            collegeId: req.alumni.collegeId
+        })
         .then((jobs) => {
-            if(jobs.length === 0){
-                res.send({EmptyError: "No jobs to show."})
-            }
-            res.send(jobs)
+            res.send(jobs);
         })
         .catch((err) => {
             res.status(400).send(err)
