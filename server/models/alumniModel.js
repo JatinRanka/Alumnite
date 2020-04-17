@@ -139,10 +139,10 @@ const AlumniSchema = new mongoose.Schema({
         },
         coordinates:{
             langitude: {
-                type: String
+                type: Number
             },
             latitude:{
-                type: String
+                type: Number
             }
         }
     },
