@@ -17,11 +17,6 @@ const AlumniSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    collegeName: {
-        type: String,
-        trim: true,
-        required: true
-    },
     collegeId : {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'College',
