@@ -4,12 +4,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const mongoose = require('mongoose');
 
-const expressOasGenerator = require('express-oas-generator');
-
-
 require('dotenv').config()
-
-expressOasGenerator.init(app, {});
 
 const PORT = process.env.PORT || 4000;
 
@@ -29,6 +24,8 @@ mongoose.connect(process.env.MONGODB_URI , {useNewUrlParser : true, autoIndex: t
 const connection = mongoose.connection;
 
 app.get('/', (req, res) => {
+    console.log();
+
     console.log("hello world");
     res.send("Server is updated and running.")
 })

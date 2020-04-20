@@ -52,6 +52,7 @@ router.post('/login', (req, res) => {
             }
             return alumni.generateAuthToken()    
                 .then((token) => {
+                    console.log(alumni._id.getTimestamp());
                     res.status(200).header('x-auth', token).send({user:alumni});
                 })
         })
@@ -220,6 +221,22 @@ router.get('/jobs', alumniAuth, (req, res) => {
         }); 
 });
 
+router.get('/jobs/:id', alumniAuth, (req, res) => {
+    var jobId = req.params.id;
+
+    Job 
+        .find({
+            _id: jobId,
+            collegeId: req.alumni.collegeId
+        })
+        .then((jobs) => {
+            res.send(jobs);
+        })
+        .catch((err) => {
+            res.status(400).send(err);
+        });
+});
+
 
 router.post('/interviews', alumniAuth, (req, res) => {
     req.body.postedBy = req.alumni._id;
@@ -257,8 +274,24 @@ router.get('/interviews', alumniAuth, (req, res) => {
             res.send(interviews);
         })
         .catch((err) => {
-            res.send(err);
+            res.status(400).send(err);
         })
+});
+
+router.get('/interviews/:id', alumniAuth, (req, res) => {
+    var interviewId = req.params.id;
+
+    Interview
+        .find({
+            _id: interviewId,
+            collegeId: req.alumni.collegeId
+        })
+        .then((interview) => {
+            res.send(interview);
+        })
+        .catch((err) => {
+            res.status(400).send(err);
+        });
 });
 
 
