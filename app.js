@@ -9,13 +9,6 @@ require('dotenv').config()
 const PORT = process.env.PORT || 4000;
 
 
-// Routes
-const adminRoute = require('./server/routes/adminRoute.js');
-const collegeRoute = require('./server/routes/collegeRoute');
-const studentRoute = require('./server/routes/StudentRoutes/studentRoute');
-const alumniRoute = require('./server/routes/AlumniRoute/AlumniRoute.js');
-
-
 app.use(bodyParser.json());
 app.use(cors());
 
@@ -23,18 +16,8 @@ app.use(cors());
 mongoose.connect(process.env.MONGODB_URI , {useNewUrlParser : true, autoIndex: true});
 const connection = mongoose.connection;
 
-app.get('/', (req, res) => {
-    console.log();
-
-    console.log("hello world");
-    res.send("Server is updated and running.")
-})
-
-app.use('/admin', adminRoute);
-app.use('/college', collegeRoute);
-app.use('/student', studentRoute);
-app.use('/alumni', alumniRoute)
-
+const router = require('./server/routes');
+app.use('/', router);
 
 
 connection.once('open', function(){
