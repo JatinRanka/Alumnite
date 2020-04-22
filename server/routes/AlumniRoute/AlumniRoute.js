@@ -79,8 +79,6 @@ router.patch('/profile', alumniAuth, (req, res) => {
         }
         res.send(result)
     })
-
-
 })
 
 //logout
@@ -225,7 +223,7 @@ router.get('/jobs/:id', alumniAuth, (req, res) => {
     var jobId = req.params.id;
 
     Job 
-        .find({
+        .findOne({
             _id: jobId,
             collegeId: req.alumni.collegeId
         })
@@ -282,7 +280,7 @@ router.get('/interviews/:id', alumniAuth, (req, res) => {
     var interviewId = req.params.id;
 
     Interview
-        .find({
+        .findOne({
             _id: interviewId,
             collegeId: req.alumni.collegeId
         })
