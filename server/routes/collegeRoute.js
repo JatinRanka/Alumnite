@@ -13,7 +13,7 @@ const {collegeAuth} = require('./../middleware/collegeAuth');
 
 // Get list of all colleges
 router.get('/', (req, res) => {
-    College.find()
+    College.find({}, {collegeName:1})
         .then((colleges) => {
             res.send(colleges)
         })
@@ -22,6 +22,17 @@ router.get('/', (req, res) => {
         })
 })
 
+
+router.get('/college', (req, res) => {
+    College
+        .find()
+        .then((colleges) => {
+            res.send(colleges);
+        })
+        .catch((err) => {
+            res.status(400).catch(err);
+        })
+})
 
 
 // register new college
@@ -36,6 +47,7 @@ router.post('/add', (req, res) => {
             res.send(err)
         })
 });
+
 
 
 // Login
@@ -191,6 +203,25 @@ router.get('/job', collegeAuth, (req, res) => {
             res.status(400).send(err)
         }); 
 });
+
+const Grid = require('gridfs-stream');
+const { mongo, connection } = require('mongoose');
+Grid.mongo = mongo;
+var fs = require('fs');
+
+router.post('/newsletters', (req, res) => {
+    var gfs = Grid(connection.db);
+    var writeStream = gfs.createWriteStream({filename: 'fileno2'});
+        fs.createReadStream('./JatinResume.pdf')
+            .pipe(writeStream);
+        writeStream.on('close', function(file){
+            res.send("success");
+        })
+})
+
+router.get('/newsletters', (req, res) => {
+    
+})
 
 
 module.exports = router;

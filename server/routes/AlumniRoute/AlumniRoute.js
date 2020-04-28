@@ -8,6 +8,7 @@ const {Alumni} = require('./../../models/alumniModel.js');
 const {Event} = require('./../../models/eventModel.js');
 const {Job} = require('./../../models/jobModel.js');
 const {Interview} = require('./../../models/interviewModel.js')
+const {Ticket} = require('./../../models/ticketModel.js');
 
 const {alumniAuth} = require('../../middleware/alumniAuth.js');
 
@@ -292,6 +293,19 @@ router.get('/interviews/:id', alumniAuth, (req, res) => {
         });
 });
 
+
+router.post('/tickets', alumniAuth, (req, res) => {
+    req.body.postedBy = req.alumni._id;
+    var ticket = new Ticket(req.body);
+
+    ticket.save()
+        .then((ticket) => {
+            res.send(ticket);
+        })
+        .catch((err) => {
+            res.status(400).send(err);
+        });
+});
 
 
 module.exports = router;

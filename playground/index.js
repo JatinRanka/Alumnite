@@ -1,5 +1,7 @@
-var keyy = [];
+// "use strict"
 
-keyy = keyy.concat(['a', 'b'], 'c');
+function foo(){
+    console.log(this);
+}
 
-console.log(keyy);
+foo();
