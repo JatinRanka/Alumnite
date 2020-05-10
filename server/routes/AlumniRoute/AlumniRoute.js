@@ -307,24 +307,24 @@ router.post('/tickets', alumniAuth, (req, res) => {
 });
 
 
-router.get('/users', (req, res) => {
+router.get('/users',alumniAuth, (req, res) => {
     const query = req.query;
-    
-    // $text: { $search: '' } 
-
     const params = {};   
 
     for(key in query){
-        console.log(typeof key);
-        console.log(query[key]);
-        params[key] = query[key];
+        params[key] = {$in: query[key]}
+    };
+
+    if("search" in params){
+        delete params["search"];
+        params["$text"] = { $search: query["search"] };
     }
 
     console.log(params);
+
     Alumni.find(
-        params
-    )
-        .select('-tokens')
+            params
+        )
         .then((alumnis) => {
             res.send(alumnis);
         })

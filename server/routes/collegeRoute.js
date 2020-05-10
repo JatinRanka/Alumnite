@@ -210,17 +210,27 @@ Grid.mongo = mongo;
 var fs = require('fs');
 
 router.post('/newsletters', (req, res) => {
+    console.log("in news");        
+
+
     var gfs = Grid(connection.db);
-    var writeStream = gfs.createWriteStream({filename: 'fileno2'});
-        fs.createReadStream('./JatinResume.pdf')
-            .pipe(writeStream);
-        writeStream.on('close', function(file){
-            res.send("success");
-        })
+    var writeStream = gfs.createWriteStream({filename: 'fileno3'});
+    fs.createReadStream(req.files.foo.data)
+        .pipe(writeStream);
+    writeStream.on('close', function(file){
+        res.send("success");
+    })
 })
 
 router.get('/newsletters', (req, res) => {
-    
+    var gfs = Grid(connection.db);
+    gfs.exist({filename: 'fileno2'}, function(err, file){
+        if (err || !file) {
+            res.send("file not found")
+        }
+        var readStream = gfs.createReadStream({filename: 'fileno2'});
+        readStream.pipe(res)
+    })
 })
 
 

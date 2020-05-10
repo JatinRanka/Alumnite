@@ -205,6 +205,7 @@ AlumniSchema.methods.removeToken = function(token){
     });
 }
 
+AlumniSchema.index({'$**': 'text'});
 
 const Alumni = mongoose.model('Alumni', AlumniSchema);
 module.exports = {Alumni};
