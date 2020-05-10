@@ -2,10 +2,6 @@ const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
-// var {trimmedString} = require('./../utils/util.js');
-
-var trimmedString = {type:String, trim:true}
-
 const AlumniSchema = new mongoose.Schema({
     email: {
         type: String,

@@ -70,17 +70,16 @@ router.get('/profile', alumniAuth ,(req, res) => {
 
 
 router.patch('/profile', alumniAuth, (req, res) => {
-    console.log(req.alumni);
-
     var alumni = req.alumni;
 
-    Alumni.findByIdAndUpdate({_id: alumni._id}, {$set: req.body}, function(err, result){
-        if(err){
-            res.status(400).send(err);
-        }
-        res.send(result)
-    })
-})
+    Alumni.findByIdAndUpdate({_id: alumni._id},  req.body)
+        .then((alumni) => {
+            res.send(alumni);
+        })
+        .catch((err) => {
+            res.status(500).send(err)
+        })
+});
 
 //logout
 router.delete('/logout', alumniAuth, (req, res) => {
@@ -307,5 +306,49 @@ router.post('/tickets', alumniAuth, (req, res) => {
         });
 });
 
+
+router.get('/users', (req, res) => {
+    const query = req.query;
+    
+    // $text: { $search: '' } 
+
+    const params = {};   
+
+    for(key in query){
+        console.log(typeof key);
+        console.log(query[key]);
+        params[key] = query[key];
+    }
+
+    console.log(params);
+    Alumni.find(
+        params
+    )
+        .select('-tokens')
+        .then((alumnis) => {
+            res.send(alumnis);
+        })
+        .catch((err) => {
+            res.status(500).send(err);
+        })
+});
+
+
+router.get('/users/:id', alumniAuth, (req, res) => {
+    var userId = req.params.id;
+
+    Alumni
+        .findOne({
+            collegeId: req.alumni.collegeId,
+            _id: userId
+        })
+        .then((alumni) => {
+            res.send(alumni);
+        })
+        .catch((err) => {
+            res.status(500).send(err);
+        })
+
+})
 
 module.exports = router;
