@@ -14,6 +14,7 @@ app.use(bodyParser.json());
 app.use(cors());
 app.use(fileUpload());
 
+
 //process.env.MONGODB_URI
 mongoose.connect(process.env.MONGODB_URI , {useNewUrlParser : true, autoIndex: true});
 const connection = mongoose.connection;
@@ -57,4 +58,6 @@ connection.once('open', function(){
 
 app.listen(PORT, function(){
     console.log("Server is running on port : ", PORT );
-})
+});
+
+module.exports = app;
