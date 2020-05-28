@@ -3,6 +3,7 @@ const router = express.Router();
 
 const _ = require('lodash');
 
+
 const {Alumni} = require('./../../models/alumniModel.js');
 const {Event} = require('./../../models/eventModel.js');
 const {Job} = require('./../../models/jobModel.js');
@@ -64,7 +65,18 @@ router.post('/login', (req, res) => {
 
 // me
 router.get('/profile', alumniAuth ,(req, res) => {
-    res.send(req.alumni);
+    // res.send(req.alumni);
+    Alumni
+        .findById({
+            _id: req.alumni._id
+        })
+        .select('-tokens')
+        .then((alumni) => {
+            res.send(alumni);
+        })
+        .catch((err) => {
+            res.status(500).send(err)
+        });
 });
 
 
@@ -77,6 +89,7 @@ router.patch('/profile', alumniAuth, (req, res) => {
             req.body,
             {new: true}  //Default value is False and it sends the old document. This statement means to send "new" (updated document) back, instead of old document.
         )
+        .select('-tokens')
         .then((alumni) => {
             res.send(alumni);
         })

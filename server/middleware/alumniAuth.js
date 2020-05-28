@@ -10,7 +10,6 @@ var alumniAuth = (req, res, next) => {
                 res.status(401).send({err: 'User not found'});
                 reject();
             }
-            console.log('herer');
             req.alumni = alumni;
             req.token = token;
 
