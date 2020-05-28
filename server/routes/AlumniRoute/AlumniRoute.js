@@ -72,7 +72,12 @@ router.get('/profile', alumniAuth ,(req, res) => {
 router.patch('/profile', alumniAuth, (req, res) => {
     var alumni = req.alumni;
 
-    Alumni.findByIdAndUpdate({_id: alumni._id},  req.body)
+    Alumni
+        .findByIdAndUpdate(
+            {_id: alumni._id},  
+            req.body,
+            {new: true}
+        )
         .then((alumni) => {
             res.send(alumni);
         })
