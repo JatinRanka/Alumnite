@@ -14,7 +14,6 @@ app.use(bodyParser.json());
 app.use(cors());
 app.use(fileUpload());
 
-
 //process.env.MONGODB_URI
 mongoose.connect(process.env.MONGODB_URI , {useNewUrlParser : true, autoIndex: true});
 const connection = mongoose.connection;

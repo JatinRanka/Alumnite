@@ -339,9 +339,10 @@ router.get('/users',alumniAuth, (req, res) => {
 
     console.log(params);
 
-    Alumni.find(
-            params
-        )
+    Alumni
+        .find(params)
+        .collation({ locale: 'en', strength: 2 })
+        .select("-tokens")
         .then((alumnis) => {
             res.send(alumnis);
         })
