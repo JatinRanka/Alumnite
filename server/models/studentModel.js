@@ -6,14 +6,11 @@ const bcrypt = require('bcryptjs');
 const StudentSchema = new mongoose.Schema({
     email: {
         type: String,
+        trim: true,
         required: true,
         unique: true
     },
     password: {
-        type: String,
-        required: true
-    },
-    collegeName: {
         type: String,
         required: true
     },
@@ -22,17 +19,42 @@ const StudentSchema = new mongoose.Schema({
         ref: 'College',
         required: true
     },
-    passOutBatch: {
+    adminId:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Admin',
+        required: true
+    },
+    startYear:{
         type: Number,
         required: true
     },
-
-    studentName: {
-        type: String,
-        lowercase: true
+    endYear: {
+        type: Number,
+        required: true
     },
+    degree: {
+        type: String,
+        required: true
+    },
+    branch: {
+        type: String,
+        required: true
+    },
+    rollNumber: {
+        type: String,
+        required: true
+    },
+    firstName: {
+        type: String,
+        required: true
+    },
+    lastName: {
+        type: String,
+    },
+
     verified: {
-        type: Boolean
+        type: Boolean,
+        default: false
     },
 
     tokens: [{
@@ -48,39 +70,89 @@ const StudentSchema = new mongoose.Schema({
 
     education: [
         {
-            period: {
-                type: String
+            startYear: {
+                type: String,
+                trim: true
+            },
+            endYear: {
+                type: String,
+                trim: true
+            },
+            course: {
+                type: String,
+                trim: true
             },
             school: {
-                type: String
+                type: String,
+                trim: true
             }
         }
     ],
 
-    work: [
+    workExperiences: [
         {
-            period: {
+            startYear: {
+                type: String
+            },
+            endYear: {
                 type: String
             },
             company: {
-                type: String
+                type: String,
+                trim: true
             },
-            role: {
-                type: String
+            workTitle: {
+                type: String,
+                trim: true
+            },
+            industry: {
+                type: String,
+                trim: true
             }
         }
     ],
 
     mobileNumber: {
-        type: String
+        type: Number
     },
 
     location: {
+        city: {
+            type: String,
+            trim: true
+        },
+        state: {
+            type: String,
+            trim: true
+        },
+        country: {
+            type: String,
+            trim: true
+        },
+        coordinates:{
+            langitude: {
+                type: Number
+            },
+            latitude:{
+                type: Number
+            }
+        }
+    },
+    socialProfiles: {
+        facebook: {
+            type: String
+        },
+        linkedin: {
+            type: String
+        }
+    },
+    imageUrl: {
         type: String
     },
-
-    skills: []
-
+    skills: [{
+        type: String,
+        trim: true
+    }]
 });
 
 
