@@ -135,10 +135,11 @@ router.post('/fill-profile', alumniAuth, (req, res) => {
 router.get('/events', alumniAuth, (req, res) => {
     
     // returns only the events organised by alumni's college
-    Event.find({
-        organiserId : req.alumni.collegeId,
-        date: { $gte : new Date()}
-    })
+    Event
+        .find({
+            organiserId : req.alumni.collegeId,
+            date: { $gte : new Date()}
+        })
         .then((events) => {
             res.send(events)
         })
@@ -152,21 +153,22 @@ router.get('/events', alumniAuth, (req, res) => {
 router.get('/events/:id', alumniAuth, (req, res) => {
     var eventId = req.params.id;
     
-    Event.findOne({
-        _id: eventId,
-        organiserId: req.alumni.collegeId
+    Event
+        .findOne({
+            _id: eventId,
+            organiserId: req.alumni.collegeId
         })
         .then((event) => {
             event.populate('attendees', ['firstName'])
                 .execPopulate(function (err, event){
                     if(err){
-                        res.status(400).send(err);
+                        res.status(500).send(err);
                     }
                     res.send({event})
                 });
         })
         .catch((err) => {
-            res.status(400).send(err);
+            res.status(500).send(err);
         });
 });
 
@@ -223,7 +225,6 @@ router.post('/jobs', alumniAuth, (req, res) => {
 
 
 router.get('/jobs', alumniAuth, (req, res) => {
-
     Job
         .find({
             collegeId: req.alumni.collegeId
@@ -235,6 +236,7 @@ router.get('/jobs', alumniAuth, (req, res) => {
             res.status(400).send(err)
         }); 
 });
+
 
 router.get('/jobs/:id', alumniAuth, (req, res) => {
     var jobId = req.params.id;
