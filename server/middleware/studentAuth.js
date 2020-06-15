@@ -7,7 +7,7 @@ var studentAuth = (req, res, next) => {
     Student.findByToken(token)
         .then((student) => {
             if(!student) {
-                reject();
+                res.status(400).send({'err': 'User not found'});
             }
 
             req.student = student;

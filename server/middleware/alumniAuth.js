@@ -7,8 +7,8 @@ var alumniAuth = (req, res, next) => {
     Alumni.findByToken(token)
         .then((alumni) => {
             if(!alumni) {
-                res.status(401).send({err: 'User not found'});
-                reject();
+                res.status(400).send({'err': 'User not found'});
+                // reject();
             }
             req.alumni = alumni;
             req.token = token;
@@ -16,7 +16,7 @@ var alumniAuth = (req, res, next) => {
             next();
         })
         .catch((err) => {
-            res.status(400).send(err);
+            res.status(500).send(err);
         });
 };
 
