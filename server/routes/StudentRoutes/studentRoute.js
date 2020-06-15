@@ -4,7 +4,7 @@ const router = express.Router();
 const _ = require('lodash');
 
 
-const {Student} = require('../../models/alumniModel');
+const {Student} = require('../../models/studentModel');
 const {College} = require('./../../models/collegeModel.js');
 const {Admin} = require('./../../models/adminModel.js');
 const {Event} = require('./../../models/eventModel.js');
@@ -12,19 +12,6 @@ const {Job} = require('./../../models/jobModel.js');
 const {Interview} = require('./../../models/interviewModel.js')
 
 const {studentAuth} = require('../../middleware/studentAuth.js');
-
-// dummy update for test
-// router.post('/test',studentAuth, (req, res) => {
-//     var student = req.student;
-
-//     student.update({collegeId : req.body.collegeId})
-//         .then(() => {
-//             res.send("successfuly updtaed")
-//         })
-//         .catch((err) => {
-//             res.status(400).send(err)
-//         })
-// })
 
 
 /*
@@ -41,7 +28,7 @@ router.post('/register', (req, res) => {
     }).then((token) => {
         res.header('x-auth', token).send(student);
     }).catch((err) => {
-        res.status(400).send(err);
+        res.status(500).send(err);
     });
 
 });
@@ -55,15 +42,15 @@ router.post('/login', (req, res) => {
     Student.findOne({email, password}) 
         .then((student) => {
             if(!student) {
-                reject();
+                res.status(404).send({"err": "Invalid credentials."})
             }
-            return student.generateAuthToken()    
+            return student.generateAuthToken(); 
         })
         .then((token) => {
-            res.status(200).header('x-auth', token).send({success: true, student});
+            res.status(200).header('x-auth', token).send(student);
         })
         .catch((err) => {
-            res.status(400).send(err)
+            res.status(500).send(err)
         });
 });
 
@@ -72,6 +59,24 @@ router.post('/login', (req, res) => {
 router.get('/profile', studentAuth ,(req, res) => {
     res.send(req.student);
 })
+
+router.patch('/profile', studentAuth, (req, res) => {
+    var student = req.student;
+
+    Student
+        .findByIdAndUpdate(
+            {_id: student._id},  
+            req.body,
+            {new: true}  //Default value is False and it sends the old document. This statement means to send "new" (updated document) back, instead of old document.
+        )
+        .select('-tokens')
+        .then((alumni) => {
+            res.send(alumni);
+        })
+        .catch((err) => {
+            res.status(500).send(err)
+        })
+});
 
 
 //logout
@@ -110,14 +115,17 @@ router.post('/fill-profile', studentAuth, (req, res) => {
 // Get list of events
 router.get('/events', studentAuth, (req, res) => {
     
-    // returns only the events organised by student's college
-    Event.find({organiserId : req.student.collegeId})
+    Event
+        .find({
+            organiserId : req.student.collegeId,
+            date: { $gte : new Date()}
+        })
         .then((events) => {
             res.send(events)
         })
         .catch((err) => {
             res.status(400).send(err);
-        })
+        });
 });
 
 
@@ -125,113 +133,61 @@ router.get('/events', studentAuth, (req, res) => {
 router.get('/events/:id', studentAuth, (req, res) => {
     var eventId = req.params.id;
     
-    Event.find({
-        _id: eventId,
-        organiserId: req.student.collegeId
-    })
+    Event
+        .findOne({
+            _id: eventId,
+            organiserId: req.student.collegeId
+        })
         .then((event) => {
-            res.send(event)
+            event.populate('attendees', ['firstName'])
+                .execPopulate(function (err, event){
+                    if(err){
+                        res.status(500).send(err);
+                    }
+                    res.send({event})
+                });
         })
         .catch((err) => {
-            res.status(400).send(err);
-        })
+            res.status(500).send(err);
+        });
 });
 
 
 router.post('/attend-event/:id', studentAuth, (req, res) =>{
-    var eventId = req.params.id;
-
-    Event.findById(eventId)
-        .then((event) => {
-
-            // if event doesn't exist
-            if(!event) {
-                res.status(404).json({NullEventError : "Event doesn't exist."})
-            }
-
-            // adds user to the list of event attendees
-            event.attendees.push(req.student)
-            event.save()
-                .then(() => {
-                    res.send({success : "event registration success"});
-                })
-                .catch((err) => {
-                    res.status(400).send(err)
-                });
-        })
-        .catch((err) => {
-            res.status(400).send(err)
-        });
+    res.status(403).send({"err" : "Student cannot attend events."});  
 });
 
 
 // post job
 router.post('/job', studentAuth, (req, res) => {
-
-    req.body.postedBy = req.student._id;
-    req.body.collegeId = req.student.collegeId;
-    var job = new Job(req.body);
-    
-    job.save()
-        .then(() => {
-            res.send({success : "job posted successfully"})
-        })
-        .catch((err) => {
-            res.status(400).send(err);
-        })
+    res.status(403).send({"err" : "Student cannot post jobs."});
 });
 
 
 router.get('/job', studentAuth, (req, res) => {
 
-    let parameters = req.query;
-
-    parameters.collegeId = req.student.collegeId;
-        
-
-    // if skillsRequired in parameters is an array, then
-    // condition is changed to $all
-    if(parameters.skillsRequired){
-        if( Array.isArray(parameters.skillsRequired) ){
-            paramSkillsRequired = parameters.skillsRequired;
-            parameters["skillsRequired"] = { $all : paramSkillsRequired };
-        }         
-    }
-
-    // similar to above 
-    if(parameters.qualification){
-        if( Array.isArray(parameters.qualification) ){
-            paramQualification = parameters.qualification;
-            parameters["qualification"] = { $all : paramQualification } ;
-        }
-    }
-
-
-    // execPopulate() is used for document(record)
-    // exec() is used for query.
     Job
-        .find(parameters)
+        .find({
+            collegeId: req.student.collegeId
+        })
         .then((jobs) => {
-            if(jobs.length === 0){
-                res.send({EmptyError: "No jobs to show."})
-            }
-            res.send(jobs)
+            res.send(jobs);
         })
         .catch((err) => {
-            res.status(400).send(err)
+            res.status(500).send(err)
         }); 
 });
 
+router.get('/jobs/:id', studentAuth, (req, res) => {
+    var jobId = req.params.id;
 
-router.post('/interview', studentAuth, (req, res) => {
-    req.body.postedBy = req.student._id;
-    req.body.collegeId = req.student.collegeId;
-
-    var interview = new Interview(req.body);
-
-    interview.save()
-        .then(() => {
-            res.send({success : "Interview experience posted successfully."})
+    Job 
+        .findOne({
+            _id: jobId,
+            collegeId: req.student.collegeId
+        })
+        .then((jobs) => {
+            res.send(jobs);
         })
         .catch((err) => {
             res.status(400).send(err);
@@ -239,19 +195,39 @@ router.post('/interview', studentAuth, (req, res) => {
 });
 
 
-router.get('/interview', (req, res) => {
+router.post('/interview', studentAuth, (req, res) => {
+    res.status(403).send({"err": "Students cannot post interviews."})
+});
 
-    var parameters = req.query;
-    parameters.collegeId = req.student.collegeId;
+
+router.get('/interview', studentAuth, (req, res) => {
 
     Interview
-        .find(parameters)
+        .find({
+            collegeId: req.student.collegeId
+        })
         .then((interviews) => {
             res.send(interviews);
         })
         .catch((err) => {
-            res.send(err);
+            res.status(500).send(err);
         })
+});
+
+router.get('/interviews/:id', studentAuth, (req, res) => {
+    var interviewId = req.params.id;
+
+    Interview
+        .findOne({
+            _id: interviewId,
+            collegeId: req.student.collegeId
+        })
+        .then((interview) => {
+            res.send(interview);
+        })
+        .catch((err) => {
+            res.status(400).send(err);
+        });
 });
 
 
