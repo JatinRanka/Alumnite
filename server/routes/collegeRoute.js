@@ -13,7 +13,9 @@ const {collegeAuth} = require('./../middleware/collegeAuth');
 
 // Get list of all colleges
 router.get('/', (req, res) => {
-    College.find({}, {collegeName:1})
+    College
+        .find({})
+        .select('collegeName')
         .then((colleges) => {
             res.send(colleges)
         })
@@ -23,47 +25,24 @@ router.get('/', (req, res) => {
 })
 
 
-router.get('/college', (req, res) => {
-    College
-        .find()
-        .then((colleges) => {
-            res.send(colleges);
-        })
-        .catch((err) => {
-            res.status(400).catch(err);
-        })
-})
-
-
-// register new college
-router.post('/add', (req, res) => {
-    var college = new College(req.body);
-
-    college.save()
-        .then(() => {
-            res.send("success")
-        })
-        .catch((err) => {
-            res.send(err)
-        })
-});
-
-
-
 // Login
 router.post('/login', (req, res) => {
     var {email, password} = _.pick(req.body, ['email', 'password']);
 
-    College.findOne({email, password})
+    College
+        .findOne({
+            email, 
+            password
+        })
         .then((college) => {
             if(!college) {
                 return res.status(404).json({err: "Check email/password"})
             }
             return college.generateAuthToken()
-            .then((token) => {
-                res.status(200).header('x-auth', token).send({user: college});
-            });
         })
+        .then((token) => {
+            res.status(200).header('x-auth', token).send({user: college});
+        }) 
         .catch((err) => {
             res.status(400).send(err);
         });

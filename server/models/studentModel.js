@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const tokenSecretKey = process.env.tokenSecretKey;
 
 
 const StudentSchema = new mongoose.Schema({
@@ -160,7 +161,7 @@ StudentSchema.methods.generateAuthToken = function(){
     var student = this;
     var access = 'auth';
 
-    var token = jwt.sign({_id: student._id.toHexString(), access, type: 'student'}, 'secretKey').toString();
+    var token = jwt.sign({_id: student._id.toHexString(), access, type: 'student'}, tokenSecretKey).toString();
 
     student.tokens.push({access, token});
 
@@ -174,7 +175,7 @@ StudentSchema.statics.findByToken = function(token){
     var decoded;
 
     try {
-        decoded = jwt.verify(token, 'secretKey');
+        decoded = jwt.verify(token, tokenSecretKey);
     } catch(err) {
         return Promise.reject();
     }

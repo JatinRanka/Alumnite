@@ -34,7 +34,7 @@ router.post('/college', adminAuth, (req, res) => {
 
     college.save()
         .then((college) => {
-            res.send({msg: 'College added successfully.', college});
+            res.send(college);
         })
         .catch((err) => {
             res.status(400).send({err});

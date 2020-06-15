@@ -9,8 +9,15 @@ const {Event} = require('./../../models/eventModel.js');
 const {Job} = require('./../../models/jobModel.js');
 const {Interview} = require('./../../models/interviewModel.js')
 const {Ticket} = require('./../../models/ticketModel.js');
-
 const {alumniAuth} = require('../../middleware/alumniAuth.js');
+
+const {forgotPassword} = require('../../controllers');
+
+
+router.post('/forgotPassword', (req, res) => {
+    console.log( forgotPassword() );
+    res.send("don")
+})
 
 
 /*
@@ -282,7 +289,6 @@ router.post('/interviews', alumniAuth, (req, res) => {
 
 
 router.get('/interviews', alumniAuth, (req, res) => {
-    
     Interview
         .find({
             collegeId: req.alumni.collegeId
