@@ -11,13 +11,34 @@ const {Interview} = require('./../../models/interviewModel.js')
 const {Ticket} = require('./../../models/ticketModel.js');
 const {alumniAuth} = require('../../middleware/alumniAuth.js');
 
-const {forgotPassword} = require('../../controllers');
+const {forgotPassword, facebookLogin} = require('../../controllers');
 
 
 router.post('/forgotPassword', (req, res) => {
     console.log( forgotPassword() );
     res.send("don")
 })
+
+router.post('/facebookLogin', async (req, res) => {
+
+    try {
+        let email = await facebookLogin(req.body.userID, req.body.accessToken);
+        let alumni = await Alumni.findOne({email});
+
+        if(!alumni){
+            res.status(404).send({'err': 'No user found with this FaceBook account.'})
+        };
+
+        let token = await alumni.generateAuthToken();
+
+        res.status(200).header('x-auth', token).send({user:alumni});
+
+    } catch (err) {
+        console.log(err);
+        res.status(400).send(err)
+    }
+});
+
 
 
 /*
@@ -56,11 +77,10 @@ router.post('/login', (req, res) => {
     Alumni.findOne({email, password}) 
         .then((alumni) => {
             if(!alumni) {
-                res.status(404).send({err: 'Check email/password.'});
+                res.status(404).send({'err': 'Invalid Credentials.'});
             }
             return alumni.generateAuthToken()    
                 .then((token) => {
-                    console.log(alumni._id.getTimestamp());
                     res.status(200).header('x-auth', token).send({user:alumni});
                 })
         })
@@ -71,7 +91,7 @@ router.post('/login', (req, res) => {
 
 
 // me
-router.get('/profile', alumniAuth ,(req, res) => {
+router.get('/profile', alumniAuth, (req, res) => {
     // res.send(req.alumni);
     Alumni
         .findById({
