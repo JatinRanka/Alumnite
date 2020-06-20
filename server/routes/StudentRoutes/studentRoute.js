@@ -44,10 +44,10 @@ router.post('/login', (req, res) => {
             if(!student) {
                 res.status(404).send({"err": "Invalid credentials."})
             }
-            return student.generateAuthToken(); 
-        })
-        .then((token) => {
-            res.status(200).header('x-auth', token).send(student);
+            return student.generateAuthToken()
+                .then((token) => {
+                    res.status(200).header('x-auth', token).send(student);
+                });
         })
         .catch((err) => {
             res.status(500).send(err)

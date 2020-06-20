@@ -1,8 +1,6 @@
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const tokenSecretKey = process.env.tokenSecretKey;
-
 
 
 const CollegeSchema = new mongoose.Schema({
@@ -54,13 +52,17 @@ CollegeSchema.methods.generateAuthToken = function() {
         type: 'college'
     };
 
-    var token = jwt.sign(payload, tokenSecretKey).toString();
+    console.log("key ", process.env.tokenSecretKey);
+    var token = jwt.sign(payload, process.env.tokenSecretKey).toString();
 
     college.tokens.push({access, token});
 
     return college.save()
         .then(() =>{
             return token;
+        })
+        .catch((err) => {
+            return Promise.reject(err)
         });
 }
 
@@ -69,9 +71,9 @@ CollegeSchema.statics.findByToken = function(token) {
     var decoded;
 
     try{
-        decoded = jwt.verify(token, tokenSecretKey);
+        decoded = jwt.verify(token, process.env.tokenSecretKey);
     } catch(err) {
-        return Promise.reject();
+        return Promise.reject(err.message);
     }
 
     return College.findOne({

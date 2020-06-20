@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const tokenSecretKey = process.env.tokenSecretKey;
 
 
 const AlumniSchema = new mongoose.Schema({
@@ -165,9 +164,10 @@ AlumniSchema.methods.generateAuthToken = function(){
         _id: alumni._id.toHexString(), 
         access, 
         type: 'alumni'
-    }
+    }   
 
-    var token = jwt.sign(payload, tokenSecretKey).toString();
+
+    var token = jwt.sign(payload, process.env.tokenSecretKey).toString();
 
     alumni.tokens.push({access, token});
 
@@ -182,9 +182,9 @@ AlumniSchema.statics.findByToken = function(token){
     var decoded;
 
     try {
-        decoded = jwt.verify(token, tokenSecretKey);
+        decoded = jwt.verify(token, process.env.tokenSecretKey);
     } catch(err) {
-        return Promise.reject();
+        return Promise.reject(err.message);
     }
 
 

@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const tokenSecretKey = process.env.tokenSecretKey;
 
 
 const AdminSchema = new mongoose.Schema({
@@ -40,7 +39,7 @@ AdminSchema.methods.generateAuthToken = function() {
         type: 'admin'
     };
 
-    var token = jwt.sign(payload, tokenSecretKey).toString();
+    var token = jwt.sign(payload, process.env.tokenSecretKey).toString();
 
     admin.tokens.push({access, token});
 
@@ -57,7 +56,7 @@ AdminSchema.statics.findByToken = function(token) {
     var decoded;
 
     try{
-        decoded = jwt.verify(token, tokenSecretKey);
+        decoded = jwt.verify(token, process.env.tokenSecretKey);
     } catch(err) {
         return Promise.reject();
     }

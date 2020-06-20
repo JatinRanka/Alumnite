@@ -7,8 +7,7 @@ var adminAuth = (req, res, next) => {
     Admin.findByToken(token)
         .then((admin) => {
             if(!admin) {
-                console.log("hi");
-                reject({msg: "admin not found"});
+                res.status(400).send({'err': "Invalid credentials."});
             }
 
             req.admin = admin;

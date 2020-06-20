@@ -4,13 +4,49 @@ const router = express.Router();
 const _ = require('lodash');
 
 
-const {College} = require('./../models/collegeModel');
-const {Student} = require('./../models/studentModel');
-const {Alumni} = require('./../models/adminModel.js');
+const {College} = require('./../models/collegeModel.js');
+const {Student} = require('./../models/studentModel.js');
+const {Alumni} = require('./../models/alumniModel.js');
 const {Admin} = require('./../models/adminModel.js');
 
 // MiddleWare
 const {adminAuth} = require('./../middleware/adminAuth.js')
+
+
+router.post('/test', (req, res) => {
+    var arr = [
+        {
+            "email": "college1@gmail.com",
+            "password": "pwd123",
+            collegeName: 'college1',
+            adminId: "5e8c46bca49607e8acf58c46"
+        },
+        {
+            email: "college2@gmail.com",
+            password: "pwd123",
+            collegeName: 'college2',
+            adminId: "5e8c46bca49607e8acf58c46"
+        },
+        {
+            email: "college3@gmail.com",
+            password: "pwd123",
+            collegeName: 'college3',
+            adminId: "5e8c46bca49607e8acf58c46"
+        }
+    ];
+
+    College.insertMany(arr, {ordered: false})
+        .then((result) => {
+            console.log(result);
+            res.send("done")
+        })
+        .catch((err) => {
+            console.log(err);
+            res.send(err)
+        })
+
+
+})
 
 
 // register new admin
@@ -29,7 +65,6 @@ router.post('/add', (req, res) => {
 // register new college
 router.post('/college', adminAuth, (req, res) => {
     req.body.adminId = req.admin._id;
-    // console.log(req.admin._id);
     var college = new College(req.body);
 
     college.save()
@@ -51,10 +86,10 @@ router.post('/login', (req, res) => {
                 return res.status(404).json({emailerror: "Admin not found with this email"})
             }
 
-            return admin.generateAuthToken();
-        })
-        .then((token) => {
-            res.status(200).header('x-auth', token).send("admin login successful");
+            return admin.generateAuthToken()
+                .then((token) => {
+                    res.status(200).header('x-auth', token).send("admin login successful");
+                });
         })
         .catch((err) => {
             console.log('in catch');

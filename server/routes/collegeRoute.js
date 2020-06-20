@@ -6,41 +6,45 @@ const _ = require('lodash');
 const {Alumni} = require('./../models/alumniModel.js')
 const {College} = require('./../models/collegeModel');
 const {Student} = require('./../models/studentModel');
-const {Event} = require('./../models/eventModel.js');
-const {NewsLetter} = require('./../models/newsletterModel.js');
+const {Event} = require('./../models/eventModel.js')
 
 const {collegeAuth} = require('./../middleware/collegeAuth');
 
-const {parseExcel} = require('./../controllers');
+const {parseExcel} = require('./../controllers')
 
-
-router.post('/insertAlumniExcel',
+router.post('/insertAlumniExcel', 
     collegeAuth,
     parseExcel,
     (req, res) => {
 
-        req.data.forEach(alumni => {
-            alumni["collegeId"] = req._id,
-            alumni["adminId"] = req.adminId,
+        req.data.forEach((alumni) => {
+            alumni["collegeId"] = req.college._id;
+            alumni["adminId"] = req.college.adminId;
             alumni["password"] = "pwd123"
-
-        });
+        }) 
 
         Alumni
-            .insertMany(req.data)
-            .then((alumnis) => {
-                res.send(alumnis)
+            .insertMany(
+                req.data,
+                {
+                    ordered: false,
+                    rawResult: true
+                }
+            )
+            .then((result) => {
+                res.send(result)
             })
             .catch((err) => {
-                res.send(err)
+                res.status(400).send(err)
             })
+        
     }
 )
-    
 
 
 // Get list of all colleges
 router.get('/', (req, res) => {
+
     College
         .find({})
         .select('collegeName')
@@ -63,16 +67,17 @@ router.post('/login', (req, res) => {
             password
         })
         .then((college) => {
-            // console.log(college);
             if(!college) {
-                return res.status(404).json({'err': "Check credentials."})
+                return res.status(404).json({err: "Check credentials."})
             }
             return college.generateAuthToken()
-        })
-        .then((token) => {
-            res.status(200).header('x-auth', token).send({user: college});
-        }) 
+                .then((token) => {
+                    res.status(200).header('x-auth', token).send({user: college});
+                });
+        })        
         .catch((err) => {
+            console.log("in catcg");
+            console.log(err);
             res.status(400).send(err);
         });
 })
@@ -212,47 +217,33 @@ router.get('/job', collegeAuth, (req, res) => {
         }); 
 });
 
+const Grid = require('gridfs-stream');
+const { mongo, connection } = require('mongoose');
+Grid.mongo = mongo;
+var fs = require('fs');
 
 router.post('/newsletters', (req, res) => {
-    console.log("in news");  
+    console.log("in news");        
 
-    console.log(req.files);
 
-    var obj = {
-        storing:{
-            data: req.files.files.data,
-            contentType: req.files.files.mimetype
-        } 
-    }
-    console.log(obj);
-
-    var newsletter = new NewsLetter(obj);
-
-    newsletter
-        .save()
-        .then((result) => {
-            console.log('saved');
-            res.send(newsletter)
-        })
-        .catch((err) => {
-            console.log('err');
-            res.status(500).send(err)
-        })
+    var gfs = Grid(connection.db);
+    var writeStream = gfs.createWriteStream({filename: 'fileno3'});
+    fs.createReadStream(req.files.foo.data)
+        .pipe(writeStream);
+    writeStream.on('close', function(file){
+        res.send("success");
+    })
 })
 
 router.get('/newsletters', (req, res) => {
-
-    NewsLetter
-        .findById("5eecab5c38a4dff2c8fbf747")
-        .then((result) => {
-            console.log("in resilt ------------------");
-            console.log(result);
-            res.set("Content-Type", result.storing.contentType);
-            res.send(result.storing.data);
-        })
-        .catch((err) => {
-            console.log(err);
-        })
+    var gfs = Grid(connection.db);
+    gfs.exist({filename: 'fileno2'}, function(err, file){
+        if (err || !file) {
+            res.send("file not found")
+        }
+        var readStream = gfs.createReadStream({filename: 'fileno2'});
+        readStream.pipe(res)
+    })
 })
 
 

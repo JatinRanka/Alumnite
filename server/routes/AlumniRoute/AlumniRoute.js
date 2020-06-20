@@ -82,7 +82,7 @@ router.post('/login', (req, res) => {
             return alumni.generateAuthToken()    
                 .then((token) => {
                     res.status(200).header('x-auth', token).send({user:alumni});
-                })
+                });
         })
         .catch((err) => {
             res.status(400).send(err)
