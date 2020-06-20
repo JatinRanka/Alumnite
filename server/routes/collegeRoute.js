@@ -6,9 +6,37 @@ const _ = require('lodash');
 const {Alumni} = require('./../models/alumniModel.js')
 const {College} = require('./../models/collegeModel');
 const {Student} = require('./../models/studentModel');
-const {Event} = require('./../models/eventModel.js')
+const {Event} = require('./../models/eventModel.js');
+const {NewsLetter} = require('./../models/newsletterModel.js');
 
 const {collegeAuth} = require('./../middleware/collegeAuth');
+
+const {parseExcel} = require('./../controllers');
+
+
+router.post('/insertAlumniExcel',
+    collegeAuth,
+    parseExcel,
+    (req, res) => {
+
+        req.data.forEach(alumni => {
+            alumni["collegeId"] = req._id,
+            alumni["adminId"] = req.adminId,
+            alumni["password"] = "pwd123"
+
+        });
+
+        Alumni
+            .insertMany(req.data)
+            .then((alumnis) => {
+                res.send(alumnis)
+            })
+            .catch((err) => {
+                res.send(err)
+            })
+    }
+)
+    
 
 
 // Get list of all colleges
@@ -35,8 +63,9 @@ router.post('/login', (req, res) => {
             password
         })
         .then((college) => {
+            // console.log(college);
             if(!college) {
-                return res.status(404).json({err: "Check email/password"})
+                return res.status(404).json({'err': "Check credentials."})
             }
             return college.generateAuthToken()
         })
@@ -183,33 +212,47 @@ router.get('/job', collegeAuth, (req, res) => {
         }); 
 });
 
-const Grid = require('gridfs-stream');
-const { mongo, connection } = require('mongoose');
-Grid.mongo = mongo;
-var fs = require('fs');
 
 router.post('/newsletters', (req, res) => {
-    console.log("in news");        
+    console.log("in news");  
 
+    console.log(req.files);
 
-    var gfs = Grid(connection.db);
-    var writeStream = gfs.createWriteStream({filename: 'fileno3'});
-    fs.createReadStream(req.files.foo.data)
-        .pipe(writeStream);
-    writeStream.on('close', function(file){
-        res.send("success");
-    })
+    var obj = {
+        storing:{
+            data: req.files.files.data,
+            contentType: req.files.files.mimetype
+        } 
+    }
+    console.log(obj);
+
+    var newsletter = new NewsLetter(obj);
+
+    newsletter
+        .save()
+        .then((result) => {
+            console.log('saved');
+            res.send(newsletter)
+        })
+        .catch((err) => {
+            console.log('err');
+            res.status(500).send(err)
+        })
 })
 
 router.get('/newsletters', (req, res) => {
-    var gfs = Grid(connection.db);
-    gfs.exist({filename: 'fileno2'}, function(err, file){
-        if (err || !file) {
-            res.send("file not found")
-        }
-        var readStream = gfs.createReadStream({filename: 'fileno2'});
-        readStream.pipe(res)
-    })
+
+    NewsLetter
+        .findById("5eecab5c38a4dff2c8fbf747")
+        .then((result) => {
+            console.log("in resilt ------------------");
+            console.log(result);
+            res.set("Content-Type", result.storing.contentType);
+            res.send(result.storing.data);
+        })
+        .catch((err) => {
+            console.log(err);
+        })
 })
 
 
