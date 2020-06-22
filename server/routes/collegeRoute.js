@@ -45,7 +45,7 @@ router.post('/insertAlumniExcel',
 
 
 // Get list of all colleges
-router.get('/', (req, res) => {
+router.get('/', collegeAuth, (req, res) => {
 
     College
         .find({})
@@ -100,21 +100,11 @@ router.delete('/logout', collegeAuth, (req, res) => {
 });
 
 
-// get college profile
-// i/p => token
 router.get('/profile', collegeAuth, (req, res) => {
     res.send(req.college);
 })
 
 
-/*
- @Type: POST
- @Route: /listOfalumni
- @Desc: For getting list of alumni from 
-        the particular college
- @input: token in header
- @output: Array (res.body) - list of alumni
-*/
 router.get('/listOfAlumni', collegeAuth, (req, res) => {
 
     var parameters = req.query;
@@ -164,63 +154,6 @@ router.post('/events', collegeAuth, (req, res) => {
 });
 
 
-router.get('/events', collegeAuth, (req, res) => {
-    var college = req.college;
-
-    // execPopulate() is used for document(record)
-    // exec() is used for query.
-
-    college
-        .populate('events')
-        .execPopulate(function (err, collegePopulated){
-            if(err){
-                res.status(400).send(err)
-            }
-            // 1. collegePopulated will return whole college profile with 
-            // the events values populated from the 'events' database.
-            // 2. fetching only the events array
-            // from the whole college profile.
-            res.send(collegePopulated.events)
-        });
-});
-
-
-router.get('/jobs', collegeAuth, (req, res) => {
-
-    let parameters = req.query;
-        
-    // if skillsRequired in parameters is an array, then
-    // condition is changed to $all
-    if(parameters.skillsRequired){
-        if( Array.isArray(parameters.skillsRequired) ){
-            paramSkillsRequired = parameters.skillsRequired;
-            parameters["skillsRequired"] = { $all : paramSkillsRequired };
-        }         
-    }
-
-    // similar to above 
-    if(parameters.qualification){
-        if( Array.isArray(parameters.qualification) ){
-            paramQualification = parameters.qualification;
-            parameters["qualification"] = { $all : paramQualification } ;
-        }
-    }
-
-
-    // execPopulate() is used for document(record)
-    // exec() is used for query.
-    Job
-        .find(parameters)
-        .then((jobs) => {
-            if(jobs.length === 0){
-                res.send({EmptyError: "No jobs to show."})
-            }
-            res.send(jobs)
-        })
-        .catch((err) => {
-            res.status(400).send(err)
-        }); 
-});
 
 
 router.post('/newsletters', collegeAuth, (req, res) => {
@@ -255,7 +188,8 @@ router.get('/newsletters', collegeAuth, (req, res) => {
         })
 })
 
-router.get('/newsletters/:id', (req, res) => {
+
+router.get('/newsletters/:id', collegeAuth, (req, res) => {
     var newsletterId = req.params.id;
 
     NewsLetter
@@ -272,6 +206,146 @@ router.get('/newsletters/:id', (req, res) => {
         });
 });
 
+
+// Get list of events
+router.get('/events', collegeAuth, (req, res) => {
+    
+    // returns only the events organised by the college
+    Event
+        .find({
+            organiserId : req.college._id,
+            date: { $gte : new Date()}
+
+        })
+        .select('-attendees')
+        .sort({'date': 1})
+        .then((events) => {
+
+            events.forEach((event) => {
+                event.sooos = "jkjkj"
+                return event
+            })
+
+
+            // events.forEach((event) => {
+            //     console.log(event.title);
+            //     event.attendeesCount = "kjajhsjk";
+            //     // delete event.attendees;
+            // })
+
+            // events = events.map(function(event){
+            //     event.set('attendeesCount', event.attendees.length, {strict: false})
+            //     console.log(event);
+            //     return event
+            // })
+
+            // console.table(events);
+            // console.log(events);                
+
+            res.send(events)
+        })
+        .catch((err) => {
+            res.status(400).send(err);
+        });
+});
+
+
+// For getting full profile of a particular event
+router.get('/events/:id', collegeAuth, (req, res) => {
+    var eventId = req.params.id;
+    
+    Event
+        .findOne({
+            _id: eventId,
+            organiserId: req.college._id
+        })
+        .then((event) => {
+            event.populate('attendees', ['firstName'])
+                .execPopulate(function (err, event){
+                    if(err){
+                        res.status(500).send(err);
+                    }
+                    res.send({event})
+                });
+        })
+        .catch((err) => {
+            res.status(500).send(err);
+        });
+});
+
+
+
+router.get('/jobs', collegeAuth, (req, res) => {
+    var params = {}
+
+    params.collegeId = req.college._id;
+
+    if("search" in req.query){
+        params["$text"] = { $search: req.query["search"] }
+    }
+    
+    Job
+        .find(params)
+        .then((jobs) => {
+            res.send(jobs);
+        })
+        .catch((err) => {
+            res.status(400).send(err)
+        }); 
+});
+
+
+router.get('/jobs/:id', collegeAuth, (req, res) => {
+    var jobId = req.params.id;
+
+    Job 
+        .findOne({
+            _id: jobId,
+            collegeId: req.college._id
+        })
+        .then((jobs) => {
+            res.send(jobs);
+        })
+        .catch((err) => {
+            res.status(400).send(err);
+        });
+});
+
+
+router.get('/interviews', collegeAuth, (req, res) => {
+    var params = {};
+
+    params.collegeId = req.college._id;
+
+    if("search" in req.query){
+        params["$text"] = { $search: req.query["search"] }
+    }
+
+    Interview
+        .find(params)
+        .then((interviews) => {
+            res.send(interviews);
+        })
+        .catch((err) => {
+            res.status(400).send(err);
+        })
+});
+
+router.get('/interviews/:id', collegeAuth, (req, res) => {
+    var interviewId = req.params.id;
+
+    Interview
+        .findOne({
+            _id: interviewId,
+            collegeId: req.college._id
+        })
+        .then((interview) => {
+            res.send(interview);
+        })
+        .catch((err) => {
+            res.status(400).send(err);
+        });
+});
 
 
 module.exports = router;

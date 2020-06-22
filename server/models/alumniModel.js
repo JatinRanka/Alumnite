@@ -3,157 +3,160 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
 
-const AlumniSchema = new mongoose.Schema({
-    email: {
-        type: String,
-        trim: true,
-        required: true,
-        unique: true
-    },
-    password: {
-        type: String,
-        required: true
-    },
-    collegeId : {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'College',
-        required: true
-    },
-    adminId:{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Admin',
-        required: true
-    },
-    startYear:{
-        type: Number,
-        required: true
-    },
-    endYear: {
-        type: Number,
-        required: true
-    },
-    degree: {
-        type: String,
-        required: true
-    },
-    branch: {
-        type: String,
-        required: true
-    },
-    rollNumber: {
-        type: String,
-        required: true
-    },
-    firstName: {
-        type: String,
-        required: true
-    },
-    lastName: {
-        type: String,
-    },
-
-    verified: {
-        type: Boolean,
-        default: false
-    },
-
-    tokens: [{
-        access: {
+const AlumniSchema = new mongoose.Schema(
+    {
+        email: {
+            type: String,
+            trim: true,
+            required: true,
+            unique: true
+        },
+        password: {
             type: String,
             required: true
         },
-        token: {
+        collegeId : {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'College',
+            required: true
+        },
+        adminId:{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Admin',
+            required: true
+        },
+        startYear:{
+            type: Number,
+            required: true
+        },
+        endYear: {
+            type: Number,
+            required: true
+        },
+        degree: {
             type: String,
-            required:true
-        }
-    }],
+            required: true
+        },
+        branch: {
+            type: String,
+            required: true
+        },
+        rollNumber: {
+            type: String,
+            required: true
+        },
+        firstName: {
+            type: String,
+            required: true
+        },
+        lastName: {
+            type: String,
+        },
 
-    education: [
-        {
-            startYear: {
+        verified: {
+            type: Boolean,
+            default: false
+        },
+
+        tokens: [{
+            access: {
                 type: String,
-                trim: true
+                required: true
             },
-            endYear: {
+            token: {
                 type: String,
-                trim: true
-            },
-            course: {
-                type: String,
-                trim: true
-            },
-            school: {
-                type: String,
-                trim: true
+                required:true
             }
-        }
-    ],
+        }],
 
-    workExperiences: [
-        {
-            startYear: {
+        education: [
+            {
+                startYear: {
+                    type: String,
+                    trim: true
+                },
+                endYear: {
+                    type: String,
+                    trim: true
+                },
+                course: {
+                    type: String,
+                    trim: true
+                },
+                school: {
+                    type: String,
+                    trim: true
+                }
+            }
+        ],
+
+        workExperiences: [
+            {
+                startYear: {
+                    type: String
+                },
+                endYear: {
+                    type: String
+                },
+                company: {
+                    type: String,
+                    trim: true
+                },
+                workTitle: {
+                    type: String,
+                    trim: true
+                },
+                industry: {
+                    type: String,
+                    trim: true
+                }
+            }
+        ],
+
+        mobileNumber: {
+            type: Number
+        },
+
+        location: {
+            city: {
+                type: String,
+                trim: true
+            },
+            state: {
+                type: String,
+                trim: true
+            },
+            country: {
+                type: String,
+                trim: true
+            },
+            coordinates:{
+                langitude: {
+                    type: Number
+                },
+                latitude:{
+                    type: Number
+                }
+            }
+        },
+        socialProfiles: {
+            facebook: {
                 type: String
             },
-            endYear: {
+            linkedin: {
                 type: String
-            },
-            company: {
-                type: String,
-                trim: true
-            },
-            workTitle: {
-                type: String,
-                trim: true
-            },
-            industry: {
-                type: String,
-                trim: true
             }
-        }
-    ],
-
-    mobileNumber: {
-        type: Number
-    },
-
-    location: {
-        city: {
-            type: String,
-            trim: true
         },
-        state: {
-            type: String,
-            trim: true
-        },
-        country: {
-            type: String,
-            trim: true
-        },
-        coordinates:{
-            langitude: {
-                type: Number
-            },
-            latitude:{
-                type: Number
-            }
-        }
-    },
-    socialProfiles: {
-        facebook: {
+        imageUrl: {
             type: String
         },
-        linkedin: {
-            type: String
-        }
+        skills: [{
+            type: String,
+            trim: true
+        }]
     },
-    imageUrl: {
-        type: String
-    },
-    skills: [{
-        type: String,
-        trim: true
-    }]
-});
+    {timestamps: true}
+);
 
 
 AlumniSchema.methods.generateAuthToken = function(){
@@ -207,6 +210,7 @@ AlumniSchema.methods.removeToken = function(token){
     });
 }
 
+// for performing serach in entire document
 AlumniSchema.index({'$**': 'text'});
 
 const Alumni = mongoose.model('Alumni', AlumniSchema);

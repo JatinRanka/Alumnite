@@ -48,5 +48,8 @@ const InterviewSchema = new mongoose.Schema(
     {timestamps: true}
 );
 
+// for performing serach in entire document
+InterviewSchema.index({'$**': 'text'});
+
 const Interview = mongoose.model('Interview', InterviewSchema)
 module.exports = {Interview};

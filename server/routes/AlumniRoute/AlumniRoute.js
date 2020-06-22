@@ -41,11 +41,6 @@ router.post('/facebookLogin', async (req, res) => {
 
 
 
-/*
- @Type: POST
- @Route: /register
- @Desc: Sign-up
-*/
 router.post('/register', (req, res) => {
 
     var alumni = new Alumni(req.body);
@@ -167,7 +162,31 @@ router.get('/events', alumniAuth, (req, res) => {
             organiserId : req.alumni.collegeId,
             date: { $gte : new Date()}
         })
+        .select('-attendees')
+        .sort({'date': 1})
         .then((events) => {
+
+            events.forEach((event) => {
+                event.sooos = "jkjkj"
+                return event
+            })
+
+
+            // events.forEach((event) => {
+            //     console.log(event.title);
+            //     event.attendeesCount = "kjajhsjk";
+            //     // delete event.attendees;
+            // })
+
+            // events = events.map(function(event){
+            //     event.set('attendeesCount', event.attendees.length, {strict: false})
+            //     console.log(event);
+            //     return event
+            // })
+
+            // console.table(events);
+            // console.log(events);                
+
             res.send(events)
         })
         .catch((err) => {
@@ -241,6 +260,7 @@ router.post('/jobs', alumniAuth, (req, res) => {
     keywords = keywords.concat(job.skillsRequired, job.qualification, job.company, job.industry, job.workTitle, job.typeOfJob);
     job.keywords = keywords;
 
+
     job.save()
         .then(() => {
             res.send({success: "job posted successfully", job})
@@ -252,10 +272,16 @@ router.post('/jobs', alumniAuth, (req, res) => {
 
 
 router.get('/jobs', alumniAuth, (req, res) => {
+    var params = {}
+
+    params.collegeId = req.alumni.collegeId;
+
+    if("search" in req.query){
+        params["$text"] = { $search: req.query["search"] }
+    }
+    
     Job
-        .find({
-            collegeId: req.alumni.collegeId
-        })
+        .find(params)
         .then((jobs) => {
             res.send(jobs);
         })
@@ -309,10 +335,16 @@ router.post('/interviews', alumniAuth, (req, res) => {
 
 
 router.get('/interviews', alumniAuth, (req, res) => {
+    var params = {};
+
+    params.collegeId = req.alumni.collegeId;
+
+    if("search" in req.query){
+        params["$text"] = { $search: req.query["search"] }
+    }
+
     Interview
-        .find({
-            collegeId: req.alumni.collegeId
-        })
+        .find(params)
         .then((interviews) => {
             res.send(interviews);
         })
@@ -356,6 +388,16 @@ router.get('/users',alumniAuth, (req, res) => {
     const query = req.query;
     const params = {};   
 
+    /* format for params which is to be passed while fetching from DB
+    params = {
+        location.city : {$in: xyz},
+        location.country: {$in: xyz},
+        ...
+        ...
+        $text : { $search: someSearchString }
+    }
+    */
+
     for(key in query){
         params[key] = {$in: query[key]}
     };
@@ -365,11 +407,9 @@ router.get('/users',alumniAuth, (req, res) => {
         params["$text"] = { $search: query["search"] };
     }
 
-    console.log(params);
-
     Alumni
         .find(params)
-        .collation({ locale: 'en', strength: 2 })
+        .collation({ locale: 'en', strength: 2 }) // collation makes search case insensitive
         .select("-tokens")
         .then((alumnis) => {
             res.send(alumnis);

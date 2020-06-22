@@ -72,6 +72,8 @@ const JobSchema = new mongoose.Schema(
     {timestamps: true}
 ); 
 
+// for performing serach in entire document
+JobSchema.index({'$**': 'text'});
 
 const Job = mongoose.model('Job', JobSchema);
 module.exports = {Job};
