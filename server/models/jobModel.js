@@ -1,74 +1,76 @@
 const mongoose = require('mongoose');
 
-const JobSchema = new mongoose.Schema({
-    
-    // Alumni Id
-    postedBy: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Alumni',
-        required: true
-    },
-    // College Id
-    collegeId:{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'College',
-        required: true
-    },
+const JobSchema = new mongoose.Schema(
+    {
+        // Alumni Id
+        postedBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Alumni',
+            required: true
+        },
+        // College Id
+        collegeId:{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'College',
+            required: true
+        },
 
-    company: {
-        type: String,
-        required: true
-    },
-    workTitle: {
-        type: String,
-        required: true
-    },
-    industry: {
-        type: String
-    },
-    // full-time / intern / part-time
-    typeOfJob: {
-        type: String,
-        enum: ['full-time', 'intern', 'part-time'],
-        required: true
-    },
-    location: {
-        city: {
+        company: {
             type: String,
-            trim: true
+            required: true
         },
-        state: {
+        workTitle: {
             type: String,
-            trim: true
+            required: true
         },
-        country: {
+        industry: {
+            type: String
+        },
+        // full-time / intern / part-time
+        typeOfJob: {
             type: String,
-            trim: true
-        }
+            enum: ['full-time', 'intern', 'part-time'],
+            required: true
+        },
+        location: {
+            city: {
+                type: String,
+                trim: true
+            },
+            state: {
+                type: String,
+                trim: true
+            },
+            country: {
+                type: String,
+                trim: true
+            }
+        },
+        salaryOffered:{
+            type: String
+        },
+        experience:{
+            // minimum Number of experience required (in yrs)
+            type: Number
+        },
+        description:{
+            type: String
+        },
+        skillsRequired: [{
+            type: String
+        }],
+        qualification: [{
+            type: String
+        }],
+        contactInfo: {
+            type: String
+        },
+        keywords: [{
+            type: String
+        }]
     },
-    salaryOffered:{
-        type: String
-    },
-    experience:{
-        // minimum Number of experience required (in yrs)
-        type: Number
-    },
-    description:{
-        type: String
-    },
-    skillsRequired: [{
-        type: String
-    }],
-    qualification: [{
-        type: String
-    }],
-    contactInfo: {
-        type: String
-    },
-    keywords: [{
-        type: String
-    }]
-}); 
+    {timestamps: true}
+); 
 
 
 const Job = mongoose.model('Job', JobSchema);
