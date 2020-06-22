@@ -8,6 +8,8 @@ const {College} = require('./../models/collegeModel');
 const {Student} = require('./../models/studentModel');
 const {Event} = require('./../models/eventModel.js')
 
+const {NewsLetter} = require('./../models/newsletterModel.js');
+
 const {collegeAuth} = require('./../middleware/collegeAuth');
 
 const {parseExcel} = require('./../controllers')
@@ -20,7 +22,7 @@ router.post('/insertAlumniExcel',
         req.data.forEach((alumni) => {
             alumni["collegeId"] = req.college._id;
             alumni["adminId"] = req.college.adminId;
-            alumni["password"] = "pwd123"
+            alumni["password"] = Math.random().toString(36).substring(2, 15) // This will generate random password.
         }) 
 
         Alumni
@@ -73,6 +75,9 @@ router.post('/login', (req, res) => {
             return college.generateAuthToken()
                 .then((token) => {
                     res.status(200).header('x-auth', token).send({user: college});
+                })
+                .catch((err) => {
+                    return Promise.reject(err)
                 });
         })        
         .catch((err) => {
@@ -144,7 +149,7 @@ router.post('/events', collegeAuth, (req, res) => {
     var event = new Event(data);
     event.save()
         .then(() => {
-            college.events.push(event) ;
+            college.events.push(event);
             college.save()
                 .then(() => {
                     res.send({event});
@@ -180,7 +185,7 @@ router.get('/events', collegeAuth, (req, res) => {
 });
 
 
-router.get('/job', collegeAuth, (req, res) => {
+router.get('/jobs', collegeAuth, (req, res) => {
 
     let parameters = req.query;
         
@@ -217,34 +222,56 @@ router.get('/job', collegeAuth, (req, res) => {
         }); 
 });
 
-const Grid = require('gridfs-stream');
-const { mongo, connection } = require('mongoose');
-Grid.mongo = mongo;
-var fs = require('fs');
 
-router.post('/newsletters', (req, res) => {
-    console.log("in news");        
+router.post('/newsletters', collegeAuth, (req, res) => {
 
+    var newsletter = new NewsLetter({
+        postedBy: req.college._id,
+        name: req.files.newsletter.name,
+        data: req.files.newsletter.data,
+        contentType: req.files.newsletter.mimetype
+    });
 
-    var gfs = Grid(connection.db);
-    var writeStream = gfs.createWriteStream({filename: 'fileno3'});
-    fs.createReadStream(req.files.foo.data)
-        .pipe(writeStream);
-    writeStream.on('close', function(file){
-        res.send("success");
-    })
+    newsletter
+        .save()
+        .then((result) => {
+            res.send({msg: "Newsletter Saved Successfully."})
+        })
+        .catch((err) => {
+            res.status(500).send(err)
+        })
+});
+
+router.get('/newsletters', collegeAuth, (req, res) => {
+    NewsLetter
+        .find({postedBy: req.college._id})
+        .select("name createdAt")
+        .sort({ 'createdAt': -1 })
+        .then((newsletters) => {
+            res.send(newsletters);
+        })
+        .catch((err) => {
+            res.status(500).send(err);
+        })
 })
 
-router.get('/newsletters', (req, res) => {
-    var gfs = Grid(connection.db);
-    gfs.exist({filename: 'fileno2'}, function(err, file){
-        if (err || !file) {
-            res.send("file not found")
-        }
-        var readStream = gfs.createReadStream({filename: 'fileno2'});
-        readStream.pipe(res)
-    })
-})
+router.get('/newsletters/:id', (req, res) => {
+    var newsletterId = req.params.id;
+
+    NewsLetter
+        .findOne({
+            _id: newsletterId,
+            postedBy: req.college._id
+        })
+        .then((newsletter) => {
+            res.set("Content-Type", newsletter.contentType);
+            res.send(newsletter.data);
+        })
+        .catch((err) => {
+            console.log(err);
+        });
+});
+
 
 
 module.exports = router;

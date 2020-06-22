@@ -6,8 +6,6 @@ var collegeAuth = (req, res, next) => {
         res.status(400).send({'err': 'User not logged in.'})
     }
 
-    console.log(token);
-
     College
         .findByToken(token)
         .then((college) => {
