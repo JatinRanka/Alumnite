@@ -3,12 +3,16 @@ const router = express.Router();
 
 const _ = require('lodash');
 
-const {Alumni} = require('./../models/alumniModel.js')
-const {College} = require('./../models/collegeModel');
-const {Student} = require('./../models/studentModel');
-const {Event} = require('./../models/eventModel.js')
-
-const {NewsLetter} = require('./../models/newsletterModel.js');
+const {
+    College,
+    Alumni,
+    Student,
+    Event,
+    NewsLetter,
+    Job,
+    Interview,
+    Ticket
+} = require('./../models');
 
 const {collegeAuth} = require('./../middleware/collegeAuth');
 
