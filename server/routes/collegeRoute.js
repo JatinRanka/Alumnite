@@ -11,12 +11,15 @@ const {
     NewsLetter,
     Job,
     Interview,
-    Ticket
+    Ticket,
+    Fund
 } = require('./../models');
 
 const {collegeAuth} = require('./../middleware/collegeAuth');
 
-const {parseExcel} = require('./../controllers')
+const {parseExcel} = require('./../controllers');
+
+
 
 router.post('/insertAlumniExcel', 
     collegeAuth,
@@ -158,13 +161,11 @@ router.post('/events', collegeAuth, (req, res) => {
 });
 
 
-
-
 router.post('/newsletters', collegeAuth, (req, res) => {
 
     var newsletter = new NewsLetter({
         postedBy: req.college._id,
-        name: req.files.newsletter.name,
+        name: req.body.fileName || req.files.newsletter.name,
         data: req.files.newsletter.data,
         contentType: req.files.newsletter.mimetype
     });
@@ -350,6 +351,23 @@ router.get('/interviews/:id', collegeAuth, (req, res) => {
             res.status(400).send(err);
         });
 });
+
+router.post('/funds', collegeAuth, (req, res) => {
+
+    req.body.raisedBy = req.college._id;
+
+    const fund = new Fund(req.body);
+
+    fund
+        .save()
+        .then((fund) => {
+            res.status(200).send(fund);
+        })
+        .catch((err) => {
+            res.status(500).send(err);
+        });
+});
+
 
 
 module.exports = router;

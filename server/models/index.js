@@ -8,6 +8,7 @@ const {NewsLetter} = require('./newsletterModel.js');
 const {Job} = require('./jobModel');
 const {Interview} = require('./interviewModel');
 const {Ticket} = require('./ticketModel');
+const { Fund } = require('./fundModel');
 
 module.exports = {
     Admin,
@@ -18,5 +19,6 @@ module.exports = {
     NewsLetter,
     Job,
     Interview,
-    Ticket
+    Ticket,
+    Fund
 }

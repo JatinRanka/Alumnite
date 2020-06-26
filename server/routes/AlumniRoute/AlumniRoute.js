@@ -3,12 +3,17 @@ const router = express.Router();
 
 const _ = require('lodash');
 
+const {
+    Alumni,
+    Event,
+    NewsLetter,
+    Job,
+    Interview,
+    Ticket,
+    Fund
+} = require('./../../models');
 
-const {Alumni} = require('./../../models/alumniModel.js');
-const {Event} = require('./../../models/eventModel.js');
-const {Job} = require('./../../models/jobModel.js');
-const {Interview} = require('./../../models/interviewModel.js')
-const {Ticket} = require('./../../models/ticketModel.js');
+
 const {alumniAuth} = require('../../middleware/alumniAuth.js');
 
 const {forgotPassword, facebookLogin} = require('../../controllers');
@@ -38,7 +43,6 @@ router.post('/facebookLogin', async (req, res) => {
         res.status(400).send(err)
     }
 });
-
 
 
 router.post('/register', (req, res) => {
@@ -76,8 +80,8 @@ router.post('/login', (req, res) => {
             }
             return alumni.generateAuthToken()    
                 .then((token) => {
-                    res.status(200).header('x-auth', token).send({user:alumni});
-                });
+                    res.status(200).header({'x-auth': token, 'access-control-expose-headers': 'x-auth'}).send({user:alumni});
+                }); 
         })
         .catch((err) => {
             res.status(400).send(err)
@@ -370,6 +374,40 @@ router.get('/interviews/:id', alumniAuth, (req, res) => {
 });
 
 
+router.get('/newsletters', alumniAuth, (req, res) => {
+    
+    NewsLetter
+        .find({postedBy: req.alumni.collegeId})
+        .select("name createdAt")
+        .sort({ 'createdAt': -1 })
+        .then((newsletters) => {
+            res.send(newsletters);
+        })
+        .catch((err) => {
+            res.status(500).send(err);
+        });
+});
+
+
+router.get('/newsletters/:id', alumniAuth, (req, res) => {
+    var newsletterId = req.params.id;
+
+    NewsLetter
+        .findOne({
+            _id: newsletterId,
+            postedBy: req.alumni.collegeId
+        })
+        .then((newsletter) => {
+            res.set("Content-Type", newsletter.contentType);
+            res.send(newsletter.data);
+        })
+        .catch((err) => {
+            console.log(err);
+        });
+});
+
+
+
 router.post('/tickets', alumniAuth, (req, res) => {
     req.body.postedBy = req.alumni._id;
     var ticket = new Ticket(req.body);
@@ -435,6 +473,111 @@ router.get('/users/:id', alumniAuth, (req, res) => {
             res.status(500).send(err);
         })
 
+});
+
+router.get('/funds', alumniAuth, (req, res) => {
+    Fund
+        .find({ raisedBy: req.alumni.collegeId })
+        .select("title subtitle totalRequired totalRaised")
+        .then((funds) => {
+            res.send(funds)
+        })
+        .catch((err) => {
+            res.status(500).send(err);
+        });
 })
+
+router.get('/funds/:id', alumniAuth, (req, res) => {
+    let fundId = req.params.id;
+
+    Fund
+        .findOne({
+            raisedBy: req.alumni.collegeId,
+            _id: fundId
+        })
+        .then((fund) => {
+            res.send(fund)
+        })
+        .catch((err) => {
+            res.status(500).send(err);
+        })
+});
+
+router.post('/funds/:id', alumniAuth, (req, res) => {
+    const {amount} = req.body;
+
+    let fundId = req.params.id;
+
+    Fund
+        .findOneAndUpdate(
+            {   
+                _id : fundId, 
+                raisedBy : req.alumni.collegeId 
+            },
+            {
+                "$push": 
+                    { 
+                        "contributors": {contributedBy: req.alumni._id, amount } 
+                    },
+                "$inc": 
+                    {
+                        "totalRaised": amount
+                    }
+            },
+            {
+                new: true // Returns updated document
+            }
+        )
+        .then((fund) => {
+            res.send(fund)
+        })
+        .catch((err) => {
+            res.status(500).send(err)
+        })
+    
+    // res.send("don")
+
+})
+
+const stripe = require('stripe')('sk_test_51F3KWQHWjDP4EbZD3FDMTuQ9gtFtw5mu35F1vfRxeGTDsmpD0ECBwoO5qc78rvnU0p6ygj12Fg5xuP6qrO4Fbb7u00JX3VeyLB', {apiVersion: ''});
+
+router.post('/fundsTest', async (req, res) => {
+    try {
+        const paymentIntent = await stripe.paymentIntents.create({
+            amount: req.body.amount,
+            currency: 'inr',
+            // Verify your integration in this guide by including this parameter
+            metadata: {integration_check: 'accept_a_payment'},
+        });
+
+    
+        console.log(paymentIntent.client_secret);
+    
+        res.json({client_secret: paymentIntent.client_secret});
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).send(err)
+    }
+})
+
+
+/*
+roomName = {
+    required: collegeId,
+        +
+    optional: (any one necessary)
+        1.year & class=None   ==> 2021 Batch
+            -check same year else throw error
+            -if room return, else create
+        2.year & class        ==> 2021 CSE or 2021 MECH
+            -check same year and class else throw error
+            -if room return, else create
+        3.interest            ==> WebDev, Marketing, etc.
+            -check room exists, else throw error
+        4.location (city)     ==> Chennai, Delhi, etc.
+            -check room exists, else create.
+    }
+*/
 
 module.exports = router;
