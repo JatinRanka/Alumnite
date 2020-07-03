@@ -562,7 +562,7 @@ router.get('/paymentClient', async (req, res) => {
 });
 
 
-router.post('/chatroom', alumniAuth, (req, res) => {
+router.post('/chatrooms', alumniAuth, (req, res) => {
     const chatRoom = new ChatRoom({
         collegeId: req.alumni.collegeId,
         name: req.body.name,
@@ -581,7 +581,7 @@ router.post('/chatroom', alumniAuth, (req, res) => {
 
 });
 
-router.get('/chatroom', alumniAuth, (req, res) => {
+router.get('/chatrooms', alumniAuth, (req, res) => {
     ChatRoom
         .find({
             collegeId: req.alumni.collegeId
@@ -592,6 +592,10 @@ router.get('/chatroom', alumniAuth, (req, res) => {
         .catch((err) => {
             res.status(500).send(err);
         })
+});
+
+router.post('/chatrooms/:id', alumniAuth, (req, res) => {
+    
 })
 
 
