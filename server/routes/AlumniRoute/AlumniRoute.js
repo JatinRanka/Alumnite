@@ -10,7 +10,9 @@ const {
     Job,
     Interview,
     Ticket,
-    Fund
+    Fund,
+    ChatRoom,
+    ChatMessage
 } = require('./../../models');
 
 
@@ -407,7 +409,6 @@ router.get('/newsletters/:id', alumniAuth, (req, res) => {
 });
 
 
-
 router.post('/tickets', alumniAuth, (req, res) => {
     req.body.postedBy = req.alumni._id;
     var ticket = new Ticket(req.body);
@@ -541,7 +542,7 @@ router.post('/funds/:id', alumniAuth, (req, res) => {
 
 const stripe = require('stripe')('sk_test_51F3KWQHWjDP4EbZD3FDMTuQ9gtFtw5mu35F1vfRxeGTDsmpD0ECBwoO5qc78rvnU0p6ygj12Fg5xuP6qrO4Fbb7u00JX3VeyLB', {apiVersion: ''});
 
-router.post('/fundsTest', async (req, res) => {
+router.get('/paymentClient', async (req, res) => {
     try {
         const paymentIntent = await stripe.paymentIntents.create({
             amount: req.body.amount,
@@ -549,9 +550,8 @@ router.post('/fundsTest', async (req, res) => {
             // Verify your integration in this guide by including this parameter
             metadata: {integration_check: 'accept_a_payment'},
         });
-
     
-        console.log(paymentIntent.client_secret);
+        console.log(paymentIntent);
     
         res.json({client_secret: paymentIntent.client_secret});
 
@@ -559,6 +559,39 @@ router.post('/fundsTest', async (req, res) => {
         console.log(err);
         res.status(500).send(err)
     }
+});
+
+
+router.post('/chatroom', alumniAuth, (req, res) => {
+    const chatRoom = new ChatRoom({
+        collegeId: req.alumni.collegeId,
+        name: req.body.name,
+        members: [req.alumni._id],
+        category: 'interest'
+    });
+
+    chatRoom
+        .save()
+        .then((result) => {
+            res.send(result)
+        })
+        .catch((err) => {
+            res.status(400).send(err);
+        });
+
+});
+
+router.get('/chatroom', alumniAuth, (req, res) => {
+    ChatRoom
+        .find({
+            collegeId: req.alumni.collegeId
+        })
+        .then((chatRooms) => {
+            res.send(chatRooms)
+        })
+        .catch((err) => {
+            res.status(500).send(err);
+        })
 })
 
 

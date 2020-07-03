@@ -52,7 +52,7 @@ router.post('/insertAlumniExcel',
 
 
 // Get list of all colleges
-router.get('/', collegeAuth, (req, res) => {
+router.get('/', (req, res) => {
 
     College
         .find({})

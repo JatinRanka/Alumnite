@@ -28,9 +28,19 @@ connection.once('open', function(){
     console.log("MongoDB connection established successfully.");
 })
 
-app.listen(PORT, function(){
+const server = app.listen(PORT, function(){
     console.log("Server is running on port : ", PORT );
 });
+
+var sockets = require('./server/chat')
+sockets.init(app);
+
+// const io = require('socket.io').listen(server);
+// // Assign socket object to every request
+// app.use(function(req, res, next) {
+//     req.io = io;
+//     next();
+// });
 
 
 module.exports = app;

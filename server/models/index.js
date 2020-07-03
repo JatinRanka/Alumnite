@@ -9,6 +9,8 @@ const {Job} = require('./jobModel');
 const {Interview} = require('./interviewModel');
 const {Ticket} = require('./ticketModel');
 const { Fund } = require('./fundModel');
+const { ChatRoom } = require('./chatRoomModel');
+const { ChatMessage } = require('./chatMessageModel')
 
 module.exports = {
     Admin,
@@ -20,5 +22,7 @@ module.exports = {
     Job,
     Interview,
     Ticket,
-    Fund
+    Fund,
+    ChatRoom,
+    ChatMessage
 }
