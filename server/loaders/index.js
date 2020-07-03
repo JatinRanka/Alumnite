@@ -3,7 +3,7 @@ const utils = require('./utils');
 const sockets = {};
 
 function enterRoomEvent(socket){
-    socket.on('join', async ({chatRoomId}, callback) => {
+    socket.on('join', async ({chatRoomId, senderId}, callback) => {
 
         const {error, user} = utils.addUser({socketId: socket.id, senderId, chatRoomId});
 
