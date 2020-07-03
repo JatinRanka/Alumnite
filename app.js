@@ -33,7 +33,7 @@ const server = app.listen(PORT, function(){
 });
 
 var sockets = require('./server/chat')
-sockets.init(app);
+sockets.init(server);
 
 // const io = require('socket.io').listen(server);
 // // Assign socket object to every request

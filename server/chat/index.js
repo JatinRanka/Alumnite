@@ -1,3 +1,5 @@
+const sockets = {};
+
 sockets.init = function (server) {
     const io = require('socket.io').listen(server);
     io.on('connection', function (socket) {
