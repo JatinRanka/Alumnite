@@ -2,11 +2,11 @@ const users = [];
 
 const addUser = ({socketId, senderId, chatRoomId}) => {
 
-    const existingUser = users.find((user) => user.senderId===senderId && user.chatRoomId===chatRoomId);
+    // const existingUser = users.find((user) => user.senderId===senderId && user.chatRoomId===chatRoomId);
 
-    if(existingUser) {
-        return ({error : 'User already exists.'});
-    }
+    // if(existingUser) {
+    //     return ({error : 'User already exists.'});
+    // }
 
     const user = {socketId, senderId, chatRoomId};
     users.push(user);
