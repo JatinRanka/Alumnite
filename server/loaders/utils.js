@@ -1,6 +1,6 @@
 const users = [];
 
-const addUser = ({socketId, senderId, chatRoomId}) => {
+const addUser = ({socketId, chatRoomId, senderId, onModel}) => {
 
     // const existingUser = users.find((user) => user.senderId===senderId && user.chatRoomId===chatRoomId);
 
@@ -8,7 +8,7 @@ const addUser = ({socketId, senderId, chatRoomId}) => {
     //     return ({error : 'User already exists.'});
     // }
 
-    const user = {socketId, senderId, chatRoomId};
+    const user = {socketId, chatRoomId, senderId, onModel};
     users.push(user);
 
     return {user};

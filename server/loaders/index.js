@@ -1,11 +1,12 @@
 const utils = require('./utils');
+const services = require('./../services');
 
 const sockets = {};
 
 function enterRoomEvent(socket){
-    socket.on('join', async ({chatRoomId, senderId}, callback) => {
+    socket.on('join', async ({chatRoomId, senderId, onModel}, callback) => {
 
-        const {error, user} = utils.addUser({socketId: socket.id, senderId, chatRoomId});
+        const {error, user} = utils.addUser({socketId: socket.id, chatRoomId, senderId, onModel});
 
         if(error){
             callback(error);
@@ -18,9 +19,21 @@ function enterRoomEvent(socket){
 }
 
 function groupMessageEvent(socket, io){
-    socket.on('messageToGroup', async ({message, category}, callback) => {
+    socket.on('messageToGroup', async ({message}, callback) => {
 
         const user = utils.getUser(socket.id);
+
+        const senderId = user.senderId;
+        const chatRoomId = user.chatRoomId;
+        const onModel = user.onModel;
+
+        const {error, messageUpdateInfo} = await services.ChatService.postMessage(senderId, onModel, chatRoomId, message)
+
+        if(error){
+            callback(error);
+        }
+
+        console.log(messageUpdateInfo);
 
         io.to(user.chatRoomId).emit('message', {text: message});
         console.log(`Received new message. ${message}`);
@@ -29,10 +42,8 @@ function groupMessageEvent(socket, io){
 }
 
 function exitRoomEvent(socket){
-    socket.on('disconnect', async (callback) => {
-        const user = utils.removeUser(socket.id);
-        callback();
-    });
+    const user = utils.removeUser(socket.id);
+    console.log(`Socket ${socket.id} left.`);
 }
 
 sockets.init = function (server) {
