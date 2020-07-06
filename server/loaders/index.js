@@ -4,17 +4,23 @@ const services = require('./../services');
 const sockets = {};
 
 function enterRoomEvent(socket){
-    socket.on('join', async ({chatRoomId, senderId, onModel}, callback) => {
+    socket.on('join', async ({chatRoomId, token}, callback) => {
 
-        const {error, user} = utils.addUser({socketId: socket.id, chatRoomId, senderId, onModel});
+        try {
+            var { error, senderId, onModel } = utils.findByToken(token);
+            if(error){
+                callback(error);
+            }
 
-        if(error){
+            var user = utils.addUser({socketId: socket.id, chatRoomId, senderId, onModel});
+
+            socket.join(user.chatRoomId);
+            console.log(`socket ${socket.id} joined ${user.chatRoomId}`);
+            callback();
+
+        } catch (error) {
             callback(error);
-        }
-
-        socket.join(user.chatRoomId);
-        console.log(`socket ${socket.id} joined ${user.chatRoomId}`);
-        callback();
+        }        
     });
 }
 

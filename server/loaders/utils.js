@@ -1,3 +1,6 @@
+// External libraries
+const jwt = require('jsonwebtoken');
+
 const users = {};
 
 const addUser = ({socketId, chatRoomId, senderId, onModel}) => {
@@ -16,9 +19,22 @@ const getUser = (socketId) => {
     return users.socketId;
 };
 
+const findByToken = (token) => {
+    try {
+        decoded = jwt.verify(token, process.env.tokenSecretKey);
+        return ({
+            senderId: decoded._id,
+            onModel: decoded.type
+        });
+    } catch (error) {
+        return { error };
+    }
+}
+
 
 module.exports = {
     addUser, 
     removeUser, 
-    getUser
+    getUser,
+    findByToken
 };
