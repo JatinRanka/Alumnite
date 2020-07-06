@@ -3,6 +3,8 @@ const router = express.Router();
 
 const _ = require('lodash');
 
+const utils = require('./../utils');
+
 const {
     College,
     Alumni,
@@ -19,6 +21,15 @@ const {collegeAuth} = require('./../middleware/collegeAuth');
 
 const {parseExcel} = require('./../controllers');
 
+router.post('/email', (req, res) => {
+    utils.sendMail('', 'test', 'test', function(err, info){
+        if(err){
+            res.status(400).send(err);
+        } else{
+            res.send(info)
+        }
+    });
+})
 
 
 router.post('/insertAlumniExcel', 
