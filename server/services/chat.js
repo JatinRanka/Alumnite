@@ -3,14 +3,14 @@ const models = require('./../models');
 class ChatService {
 
     static async postMessage(senderId, onModel, chatRoomId, message){
-        const message = new models.ChatMessage({
+        const chatMessage = new models.ChatMessage({
             senderId,
             onModel,
             chatRoomId,
             message
         });
 
-        return message.save()
+        return chatMessage.save()
             .then((messageUpdateInfo) => {
                 return Promise.resolve({messageUpdateInfo});
             })
