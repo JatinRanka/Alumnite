@@ -13,7 +13,7 @@ function enterRoomEvent(socket){
             }
 
             var user = utils.addUser({socketId: socket.id, chatRoomId, senderId, onModel});
-
+            console.log(user);
             socket.join(user.chatRoomId);
             console.log(`socket ${socket.id} joined ${user.chatRoomId}`);
             callback();
@@ -28,12 +28,12 @@ function groupMessageEvent(socket, io){
     socket.on('messageToGroup', async ({message}, callback) => {
 
         const user = utils.getUser(socket.id);
-
+        console.log(user);
         const senderId = user.senderId;
         const chatRoomId = user.chatRoomId;
         var onModel = user.onModel;
 
-        onModel = string.charAt(0).toUpperCase() + string.slice(1); // To capitalize first char of the model. (Eg: alumni => Alumni)
+        onModel = onModel.charAt(0).toUpperCase() + onModel.slice(1); // To capitalize first char of the model. (Eg: alumni => Alumni)
 
         const {error, messageUpdateInfo} = await services.ChatService.postMessage(senderId, onModel, chatRoomId, message)
 

@@ -4,19 +4,19 @@ const jwt = require('jsonwebtoken');
 const users = {};
 
 const addUser = ({socketId, chatRoomId, senderId, onModel}) => {
-    users.socketId = { chatRoomId, senderId, onModel };
-    return users.socketId;
+    users[socketId] = { chatRoomId, senderId, onModel };
+    return users[socketId];
 }
 
 const removeUser = (socketId) => {
-    const user = users.socketId;
-    delete users.socketId;
+    const user = users[socketId];
+    delete users[socketId];
 
     return user;
 }
 
 const getUser = (socketId) => {
-    return users.socketId;
+    return users[socketId];
 };
 
 const findByToken = (token) => {
