@@ -1,30 +1,24 @@
-const users = [];
+const users = {};
 
 const addUser = ({socketId, chatRoomId, senderId, onModel}) => {
-
-    // const existingUser = users.find((user) => user.senderId===senderId && user.chatRoomId===chatRoomId);
-
-    // if(existingUser) {
-    //     return ({error : 'User already exists.'});
-    // }
-
-    const user = {socketId, chatRoomId, senderId, onModel};
-    users.push(user);
-
-    return {user};
+    users.socketId = { chatRoomId, senderId, onModel };
+    return users.socketId;
 }
 
 const removeUser = (socketId) => {
-    const index = users.findIndex((user) => user.socketId===socketId);
+    const user = users.socketId;
+    delete users.socketId;
 
-    return users.splice(index, 1)[0];
+    return user;
 }
 
-const getUser = (socketId) => {return users.find((user) => user.socketId === socketId)};
-
-const getUsersInRoom = (room) => {
-    return users.filter((user) => user.room === room)
+const getUser = (socketId) => {
+    return users.socketId;
 };
+
+// const getUsersInRoom = (room) => {
+//     return users.filter((user) => user.room === room)
+// };
 
 module.exports = {
     addUser, 

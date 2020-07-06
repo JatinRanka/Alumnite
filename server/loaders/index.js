@@ -13,7 +13,7 @@ function enterRoomEvent(socket){
         }
 
         socket.join(user.chatRoomId);
-        console.log(`socket ${user.socketId} joined ${user.chatRoomId}`);
+        console.log(`socket ${socket.id} joined ${user.chatRoomId}`);
         callback();
     });
 }
@@ -35,8 +35,7 @@ function groupMessageEvent(socket, io){
 
         console.log(messageUpdateInfo);
 
-        io.to(user.chatRoomId).emit('message', {text: message});
-        console.log(`Received new message. ${message}`);
+        io.to(user.chatRoomId).emit('message', {newMessage: messageUpdateInfo});
         callback();
     });
 }
