@@ -4,7 +4,7 @@ const ChatMessageSchema = new mongoose.Schema(
     {
         senderId:{
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'onModel',
+            refPath: 'onModel',
             required: true
         },
         onModel:{

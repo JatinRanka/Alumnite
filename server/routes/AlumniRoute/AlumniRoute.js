@@ -594,8 +594,53 @@ router.get('/chatrooms', alumniAuth, (req, res) => {
         })
 });
 
-router.post('/chatrooms/:id', alumniAuth, (req, res) => {
+router.get('/chatrooms/:id', alumniAuth, (req, res) => {
+    const chatRoomId = req.params.id;
+
     
+    ChatRoom
+        .findOne
+        ({
+            _id: chatRoomId,
+            collegeId: req.alumni.collegeId
+        })
+        .lean()
+        .then((chatRoom) => {
+            if(!chatRoom){
+                return res.status(400).send({err: "Chatroom doesn't exist."});
+            }
+            
+            if(chatRoom.type === "year" && req.alumni.endYear !== chatRoom.year){
+                return res.status(400).send({err: `You cant access this chat room. Only ${year} year Alumni can access.`});
+            }
+
+            if(chatRoom.type === "yearCourse" && (chatRoom.year !== req.alumni.endYear || chatRoom.course !==  req.alumni.branch) ) {
+                return res.status(400).send({err: `You cant access this chat room. Only ${chatRoom.year} year ${chatRoom.course} branch Alumni can access.`});
+            }
+
+
+            ChatMessage
+                .find({chatRoomId})
+                .populate('senderId', 'firstName')
+                .then((messages) => {
+                    res.send({
+                        currentUserId: req.alumni._id,
+                        messages
+                    });
+                })
+                .catch((err) => {
+                    res.status(500).send(err);
+                })
+
+
+
+
+        })
+        .catch((err) => {
+            res.send(err)
+        })
+        
+
 })
 
 
