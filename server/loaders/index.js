@@ -31,7 +31,9 @@ function groupMessageEvent(socket, io){
 
         const senderId = user.senderId;
         const chatRoomId = user.chatRoomId;
-        const onModel = user.onModel;
+        var onModel = user.onModel;
+
+        onModel = string.charAt(0).toUpperCase() + string.slice(1); // To capitalize first char of the model. (Eg: alumni => Alumni)
 
         const {error, messageUpdateInfo} = await services.ChatService.postMessage(senderId, onModel, chatRoomId, message)
 
