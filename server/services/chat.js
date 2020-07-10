@@ -1,4 +1,5 @@
 const models = require('./../models');
+const { ChatMessage } = require('../models/chatMessageModel');
 
 class ChatService {
 
@@ -10,7 +11,10 @@ class ChatService {
             message
         });
 
-        return chatMessage.save()
+
+        const options = [{path:'senderId', select:'firstName'}]
+
+        return ChatMessage.populate(chatMessage, options)
             .then((messageUpdateInfo) => {
                 return Promise.resolve({messageUpdateInfo});
             })
@@ -19,8 +23,6 @@ class ChatService {
                 return Promise.resolve({error});
             });
     }
-
-
 }
 
 module.exports = ChatService;
