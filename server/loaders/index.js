@@ -43,8 +43,8 @@ function groupMessageEvent(socket, io){
         }
 
         console.log(messageUpdateInfo);
-
-        io.to(user.chatRoomId).emit('messageToGroup', {newMessage: messageUpdateInfo});
+        socket.broadcast.to(user.chatRoomId).emit('messageToGroup', {newMessage: messageUpdateInfo});
+        // io.to(user.chatRoomId).emit('messageToGroup', {newMessage: messageUpdateInfo});
         callback();
     });
 }
