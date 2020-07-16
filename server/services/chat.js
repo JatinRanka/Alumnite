@@ -1,5 +1,6 @@
 const models = require('./../models');
 const { ChatMessage } = require('../models/chatMessageModel');
+const { callbackPromise } = require('nodemailer/lib/shared');
 
 class ChatService {
 
@@ -11,17 +12,38 @@ class ChatService {
             message
         });
 
+        console.log(chatMessage);
+
 
         const options = [{path:'senderId', select:'firstName'}]
 
-        return ChatMessage.populate(chatMessage, options)
-            .then((messageUpdateInfo) => {
-                return Promise.resolve({messageUpdateInfo});
-            })
-            .catch((error) => {
-                console.log(error);
-                return Promise.resolve({error});
-            });
+        
+        // chatMessage.save(function(error, chatMessage){ 
+        //     if(error){
+        //         return new Promise.resolve({error});
+        //     }
+        //     ChatMessage
+        //         .populate(chatMessage, options)
+        //         .then((messageUpdateInfo) => {
+        //             return new Promise.resolve({messageUpdateInfo});
+        //         })
+        //         .catch((error) => {
+        //             return new Promise.resolve({error});
+        //         });  
+
+        // })
+
+        return chatMessage.save().then(() => {
+            return ChatMessage.populate(chatMessage, options)
+                .then((messageUpdateInfo) => {
+                    return Promise.resolve({messageUpdateInfo});
+                })
+                .catch((error) => {
+                    console.log(error);
+                    return Promise.resolve({error});
+                });
+        })
+        
     }
 }
 

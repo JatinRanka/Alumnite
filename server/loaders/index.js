@@ -38,7 +38,8 @@ function groupMessageEvent(socket, io){
         const {error, messageUpdateInfo} = await services.ChatService.postMessage(senderId, onModel, chatRoomId, message)
 
         if(error){
-            callback(error);
+            console.log(error)
+            return callback(error);
         }
 
         console.log(messageUpdateInfo);
