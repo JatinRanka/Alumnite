@@ -11,7 +11,8 @@ var alumniAuth = (req, res, next) => {
     Alumni.findByToken(token)
         .then((alumni) => {
             if(!alumni) {
-                res.status(400).send({'err': "Token invalid."});
+                console.log(alumni);
+                return res.status(400).send({'err': "Token invalid."});
             }
             req.alumni = alumni;
             req.token = token;
