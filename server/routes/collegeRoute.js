@@ -14,22 +14,35 @@ const {
     Job,
     Interview,
     Ticket,
-    Fund
+    Fund,
+    ChatRoom
 } = require('./../models');
+
 
 const {collegeAuth} = require('./../middleware/collegeAuth');
 
 const {parseExcel} = require('./../controllers');
 
-router.post('/email', (req, res) => {
-    utils.sendMail('', 'test', 'test', function(err, info){
-        if(err){
-            res.status(400).send(err);
-        } else{
-            res.send(info)
-        }
-    });
-})
+const Services = require('./../services');
+
+router.get('/email', collegeAuth, (req, res) => {
+
+    Services.EmailService.fetchUsers(collegeId=req.college._id, req.query.endYear, req.query.branch)
+        .then((alumnis) => {
+            console.log(alumnis);
+            // res.send(alumnis)
+            alumnis = ['jatinranka123@gmail.com' ]
+            return Services.EmailService.sendMail(to=alumnis, req.body.subject, req.body.message)
+        })
+        .then((mailInfo) => {
+            console.log(mailInfo);
+            res.send(mailInfo)
+        })
+        .catch((err) => {
+            console.log(err);
+            res.status(500).send(err);
+        })
+});
 
 
 router.post('/insertAlumniExcel', 
@@ -378,6 +391,91 @@ router.post('/funds', collegeAuth, (req, res) => {
             res.status(500).send(err);
         });
 });
+
+router.get('/chatrooms', collegeAuth, (req, res) => {
+    ChatRoom
+        .find({
+            collegeId: req.college._id
+        })
+        .sort({ category: -1, year:1 })
+        .then((chatRooms) => {
+            res.send(chatRooms)
+        })
+        .catch((err) => {
+            res.status(500).send(err);
+        })
+});
+
+router.get('/chatrooms/:id', collegeAuth, (req, res) => {
+    const chatRoomId = req.params.id;
+
+    ChatRoom
+        .findOne
+        ({
+            _id: chatRoomId,
+            collegeId: req.college._id
+        })
+        .lean()
+        .then((chatRoom) => {
+            if(!chatRoom){
+                return res.status(400).send({err: "Chatroom doesn't exist."});
+            }
+
+            ChatMessage
+                .find({chatRoomId})
+                .populate('senderId', 'firstName')
+                .then((messages) => {
+                    res.send({
+                        currentUserId: req.alumni._id,
+                        messages
+                    });
+                })  
+                .catch((err) => {
+                    res.status(500).send(err);
+                });
+        })
+        .catch((err) => {
+            res.status(500).send(err)
+        });        
+
+})
+
+router.post('/chatrooms', collegeAuth, (req, res) => {
+
+    let {name, category, year, course} = req.body;
+
+    if(category=="year" && !year) {
+        res.status(400).send({err: 'Year required.'});
+    }
+
+    if(category=="yearCourse" && !(year && course) ){
+        res.status(400).send({err: 'Year and course both required.'});
+    }
+
+    if (category == "year") {
+        name = year;
+    } else if (category == "yearCourse") {
+        name = year + ' ' + course;
+    }
+
+    const chatRoom = new ChatRoom({
+        collegeId: req.college._id,
+        name,
+        category,
+        year,
+        course
+    });
+
+    chatRoom.save()
+        .then((chatRoom) => {
+            res.status(201).send(chatRoom);
+        })
+        .catch((err) => {
+            res.status(500).send(err);
+        });
+
+
+})
 
 
 
