@@ -650,36 +650,11 @@ router.get('/chatrooms/:id', alumniAuth, (req, res) => {
                 })
                 .catch((err) => {
                     res.status(500).send(err);
-                })
-
-
-
-
+                });
         })
         .catch((err) => {
-            res.send(err)
-        })
-        
-
-})
-
-
-/*
-roomName = {
-    required: collegeId,
-        +
-    optional: (any one necessary)
-        1.year & class=None   ==> 2021 Batch
-            -check same year else throw error
-            -if room return, else create
-        2.year & class        ==> 2021 CSE or 2021 MECH
-            -check same year and class else throw error
-            -if room return, else create
-        3.interest            ==> WebDev, Marketing, etc.
-            -check room exists, else throw error
-        4.location (city)     ==> Chennai, Delhi, etc.
-            -check room exists, else create.
-    }
-*/
+            res.status(500).send(err)
+        });     
+});
 
 module.exports = router;
