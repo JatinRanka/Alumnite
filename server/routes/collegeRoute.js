@@ -15,7 +15,8 @@ const {
     Interview,
     Ticket,
     Fund,
-    ChatRoom
+    ChatRoom,
+    ChatMessage
 } = require('./../models');
 
 
@@ -417,6 +418,7 @@ router.get('/chatrooms/:id', collegeAuth, (req, res) => {
         })
         .lean()
         .then((chatRoom) => {
+            console.log(chatRoom);
             if(!chatRoom){
                 return res.status(400).send({err: "Chatroom doesn't exist."});
             }
@@ -426,15 +428,17 @@ router.get('/chatrooms/:id', collegeAuth, (req, res) => {
                 .populate('senderId', 'firstName')
                 .then((messages) => {
                     res.send({
-                        currentUserId: req.alumni._id,
+                        currentUserId: req.college._id,
                         messages
                     });
                 })  
                 .catch((err) => {
+                    console.log(err);                        
                     res.status(500).send(err);
                 });
         })
         .catch((err) => {
+            console.log(err);
             res.status(500).send(err)
         });        
 
