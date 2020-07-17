@@ -584,8 +584,28 @@ router.post('/chatrooms', alumniAuth, (req, res) => {
 router.get('/chatrooms', alumniAuth, (req, res) => {
     ChatRoom
         .find({
-            collegeId: req.alumni.collegeId
+            collegeId: req.alumni.collegeId,
+            $or: 
+                [
+                    { 
+                        category: 'interest' 
+                    },
+                    { $and: 
+                        [
+                            {category:'year'}, 
+                            {year: req.alumni.endYear} 
+                        ]
+                    },
+                    { $and: 
+                        [
+                            { category: 'yearCourse' },
+                            { year: req.alumni.endYear },
+                            { course: req.alumni.branch }
+                        ]
+                    }
+                ]
         })
+        .sort({ category: -1, year:1 })
         .then((chatRooms) => {
             res.send(chatRooms)
         })
