@@ -26,14 +26,14 @@ const {parseExcel} = require('./../controllers');
 
 const Services = require('./../services');
 
-router.get('/email', collegeAuth, (req, res) => {
+router.post('/email', collegeAuth, (req, res) => {
 
-    Services.EmailService.fetchUsers(collegeId=req.college._id, req.query.endYear, req.query.branch)
+    Services.EmailService.fetchUsers(req.college._id, req.query)
         .then((alumnis) => {
             console.log(alumnis);
-            // res.send(alumnis)
+            res.send(alumnis)
             alumnis = ['jatinranka123@gmail.com' ]
-            return Services.EmailService.sendMail(to=alumnis, req.body.subject, req.body.message)
+            // return Services.EmailService.sendMail(to=alumnis, req.body.subject, req.body.message)
         })
         .then((mailInfo) => {
             console.log(mailInfo);
@@ -418,7 +418,6 @@ router.get('/chatrooms/:id', collegeAuth, (req, res) => {
         })
         .lean()
         .then((chatRoom) => {
-            console.log(chatRoom);
             if(!chatRoom){
                 return res.status(400).send({err: "Chatroom doesn't exist."});
             }
@@ -479,7 +478,9 @@ router.post('/chatrooms', collegeAuth, (req, res) => {
         });
 
 
-})
+});
+
+
 
 
 

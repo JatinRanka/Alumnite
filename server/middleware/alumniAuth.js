@@ -5,7 +5,7 @@ var alumniAuth = (req, res, next) => {
     var token = req.header('x-auth');
 
     if(!token){
-        res.status(400).send({'err': 'Token not found (user not logged in).'})
+        return res.status(400).send({'err': 'Token not found (user not logged in).'})
     }
 
     Alumni.findByToken(token)

@@ -438,18 +438,21 @@ router.get('/users',alumniAuth, (req, res) => {
     */
 
     for(key in query){
-        params[key] = {$in: query[key]}
+        if (query[key]){
+            params[key] = {$in: query[key]}
+        }
     };
 
     if("search" in params){
-        delete params["search"];
         params["$text"] = { $search: query["search"] };
+        delete params["search"];
     }
+    console.log(params);
 
     Alumni
         .find(params)
         .collation({ locale: 'en', strength: 2 }) // collation makes search case insensitive
-        .select("-tokens")
+        .select("-tokens -password")
         .then((alumnis) => {
             res.send(alumnis);
         })
@@ -534,11 +537,9 @@ router.post('/funds/:id', alumniAuth, (req, res) => {
         })
         .catch((err) => {
             res.status(500).send(err)
-        })
-    
-    // res.send("don")
-
-})
+        });
+ 
+});
 
 const stripe = require('stripe')('sk_test_51F3KWQHWjDP4EbZD3FDMTuQ9gtFtw5mu35F1vfRxeGTDsmpD0ECBwoO5qc78rvnU0p6ygj12Fg5xuP6qrO4Fbb7u00JX3VeyLB', {apiVersion: ''});
 
@@ -638,7 +639,6 @@ router.get('/chatrooms/:id', alumniAuth, (req, res) => {
                 return res.status(400).send({err: `You cant access this chat room. Only ${chatRoom.year} year ${chatRoom.course} branch Alumni can access.`});
             }
 
-
             ChatMessage
                 .find({chatRoomId})
                 .populate('senderId', 'firstName')
@@ -656,5 +656,7 @@ router.get('/chatrooms/:id', alumniAuth, (req, res) => {
             res.status(500).send(err)
         });     
 });
+
+
 
 module.exports = router;
