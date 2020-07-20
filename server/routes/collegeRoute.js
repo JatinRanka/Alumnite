@@ -134,22 +134,96 @@ router.delete('/logout', collegeAuth, (req, res) => {
 
 router.get('/profile', collegeAuth, (req, res) => {
     res.send(req.college);
-})
+});
 
 
-router.get('/listOfAlumni', collegeAuth, (req, res) => {
+// For search page, alumni directory
+router.get('/users', collegeAuth, (req, res) => {
+    const query = req.query;
+    const params = {};   
 
-    var parameters = req.query;
-    parameters.collegeId = req.college._id;
+    /* format for params which is to be passed while fetching from DB
+    params = {
+        location.city : {$in: xyz},
+        location.country: {$in: xyz},
+        ...
+        ...
+        $text : { $search: someSearchString }
+    }
+    */
 
-    Alumni.find(parameters)
-        .then((alumni) => {
-            res.send(alumni)
+    for(key in query){
+        if (query[key]){
+            params[key] = {$in: query[key]}
+        }
+    };
+
+    if("search" in params){
+        params["$text"] = { $search: query["search"] };
+        delete params["search"];
+    }
+    console.log(params);
+
+    Alumni
+        .find(params)
+        .collation({ locale: 'en', strength: 2 }) // collation makes search case insensitive
+        .select("-tokens -password")
+        .then((alumnis) => {
+            res.send(alumnis);
         })
         .catch((err) => {
-            res.status(200).send(err)
+            res.status(500).send(err);
         })
+});
+
+router.get('/alumni/:id', collegeAuth, (req, res) => {
+    Alumni
+        .findOne({
+            _id: req.params.id,
+            collegeId: req.college._id
+        })
+        .select("-password -tokens")
+        .then((alumni) => {
+            res.status(200).send(alumni);
+        })
+        .catch((err) => {
+            res.status(500).send(err)
+        });
 })
+
+// To verify alumni
+router.patch('/alumni/:id', collegeAuth, (req, res) => {
+    Alumni
+        .findOneAndUpdate(
+            {
+            _id: req.params.id,
+            collegeId: req.college._id
+            },
+            {verified: true},
+            {new: true}
+        )
+        .then((alumni) => {
+            res.status(200).send(alumni);
+        })
+        .catch((err) => {
+            res.status(500).send(err)
+        });
+});
+
+
+router.delete('/alumni/:id', collegeAuth, (req, res) => {
+    Alumni
+        .findOneAndDelete({
+            _id: req.params.id,
+            collegeId: req.college._id
+        })
+        .then((alumni) => {
+            res.status(200).send(alumni)
+        })
+        .catch((err) => {
+            res.status(500).send(err)
+        });
+});
 
 
 // post events
@@ -480,6 +554,8 @@ router.post('/chatrooms', collegeAuth, (req, res) => {
 
 });
 
+
+router.get('/')
 
 
 
