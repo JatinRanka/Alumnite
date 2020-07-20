@@ -15,7 +15,7 @@ app.use(cors());
 app.use(fileUpload());
 app.use('/', router);
 
-
+mongoose.set('useFindAndModify', false);
 mongoose.connect(
     process.env.MONGODB_URI, 
     {
