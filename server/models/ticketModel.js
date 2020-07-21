@@ -7,6 +7,11 @@ const TicketSchema = new mongoose.Schema(
             required: true,
             ref: 'Alumni'
         },
+        collegeId:{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'College',
+            required: true
+        },
         title: {
             type: String,
             required: true
@@ -19,13 +24,15 @@ const TicketSchema = new mongoose.Schema(
             type: String,
             required: true
         },
-        resolved: {
-            type: Boolean,
-            default: false
+        status: {
+            type: String,
+            required: true,
+            enum: ['open', 'closed', 'onProgress'],
+            default: 'open'
         }
     },
     {timestamps: true}
 );
 
 const Ticket = mongoose.model('Ticket', TicketSchema);
-module.exports = {Ticket};  
+module.exports = {Ticket};
