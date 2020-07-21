@@ -7,7 +7,7 @@ const TicketSchema = new mongoose.Schema(
             required: true,
             ref: 'Alumni'
         },
-        collegeId:{
+        collegeId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'College',
             required: true

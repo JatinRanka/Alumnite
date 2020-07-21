@@ -411,6 +411,8 @@ router.get('/newsletters/:id', alumniAuth, (req, res) => {
 
 router.post('/tickets', alumniAuth, (req, res) => {
     req.body.postedBy = req.alumni._id;
+    req.body.collegeId = req.alumni.collegeId;
+    console.log(req.body);
     var ticket = new Ticket(req.body);
 
     ticket.save()
