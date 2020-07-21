@@ -176,6 +176,7 @@ router.get('/users', collegeAuth, (req, res) => {
         })
 });
 
+
 router.get('/alumni/:id', collegeAuth, (req, res) => {
     Alumni
         .findOne({
@@ -555,9 +556,77 @@ router.post('/chatrooms', collegeAuth, (req, res) => {
 });
 
 
-router.get('/')
+router.get('/tickets', collegeAuth, (req, res) => {
+    Ticket
+        .find({
+            collegeId: req.college._id
+        })
+        .select('-description')
+        .then((tickets) => {
+            res.status(200).send(tickets);
+        })
+        .catch((err) => {
+            res.status(500).send(err);
+        });
+});
+
+router.get('/tickets/:id', collegeAuth, (req, res) => {
+    Ticket
+        .findOne({
+            _id: req.params.id,
+            collegeId: req.college._id
+        })
+        .populate('postedBy', 'firstName lastName')
+        .then((ticket) => {
+            if(!ticket){
+                return res.status(404).send({err: 'Ticket not found.'})
+            }
+            res.status(200).send(ticket);
+        })
+        .catch((err) => {
+            res.status(500).send(err);
+        });
+});
 
 
+router.patch('/tickets/:id', collegeAuth, async (req, res) => {
+
+    try {
+        var ticket = await Ticket
+                                .findOne({
+                                    _id: req.params.id,
+                                    collegeId: req.college._id
+                                    })
+                                .populate('postedBy', 'email');
+
+        
+        if(!ticket){
+            throw "Ticket doesn't exist!";
+        }
+
+        console.log(ticket);
+
+        if(req.body.subject && req.body.message){
+            // const email = ticket.postedBy.email;
+            // const email = 'jatinranka123@gmail.com';
+            // const mailInfo = await Services.EmailService.sendMail(to=email, req.body.subject, req.body.message);
+        }
+
+        ticket.status = req.body.status;
+
+        ticket.save()
+            .then((ticket) => {
+                res.status(200).send(ticket)
+            })
+            .catch((err) => {
+                res.status(500).send(err);        
+            })
+         
+    } catch (err) {
+        res.status(500).send({err});    
+    } 
+
+});
 
 
 module.exports = router;
