@@ -3,12 +3,19 @@ const router = express.Router();
 
 const _ = require('lodash');
 
-
-const {College} = require('./../models/collegeModel.js');
-const {Student} = require('./../models/studentModel.js');
-const {Alumni} = require('./../models/alumniModel.js');
-const {Admin} = require('./../models/adminModel.js');
-
+const {
+    College,
+    Alumni,
+    Student,
+    Event,
+    NewsLetter,
+    Job,
+    Interview,
+    Ticket,
+    Fund,
+    ChatRoom,
+    ChatMessage
+} = require('./../models');
 // MiddleWare
 const {adminAuth} = require('./../middleware/adminAuth.js')
 
@@ -116,24 +123,61 @@ router.get('/profile', adminAuth, (req, res) => {
 })
 
 
-// get all alumni
-router.get('/listOfAlumni', adminAuth, (req, res) => {
-    let parameters = req.query;
-    console.log(parameters);
+// For search page, alumni directory
+router.get('/users', adminAuth, (req, res) => {
+    const query = req.query;
+    const params = {};   
 
-  
+    /* format for params which is to be passed while fetching from DB
+    params = {
+        location.city : {$in: xyz},
+        location.country: {$in: xyz},
+        ...
+        ...
+        $text : { $search: someSearchString }
+    }
+    */
 
-    Alumni.find({  skills : {$all: ["ai", "ml", "ds"]}   })
+    for(key in query){
+        if (query[key]){
+            params[key] = {$in: query[key]}
+        }
+    };
 
-        .then((alumni) => {
-            res.send(alumni)
+    if("search" in params){
+        params["$text"] = { $search: query["search"] };
+        delete params["search"];
+    }
+
+    console.log(params);
+
+    Alumni
+        .find(params)
+        .collation({ locale: 'en', strength: 2 }) // collation makes search case insensitive
+        .select("-tokens -password")
+        .then((alumnis) => {
+            res.send(alumnis);
         })
         .catch((err) => {
-            res.status(400).send(err);
+            res.status(500).send(err);
         })
+});
+
+
+router.get('/alumni/:id', adminAuth, (req, res) => {
+    Alumni
+        .findOne({
+            _id: req.params.id
+        })
+        .select("-password -tokens")
+        .then((alumni) => {
+            res.status(200).send(alumni);
+        })
+        .catch((err) => {
+            res.status(500).send(err)
+        });
 })
 
-// skills : {$all: ["ai", "ml", "ds"]}
 
 module.exports = router;
 
