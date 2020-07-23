@@ -46,7 +46,7 @@ router.post('/login', (req, res) => {
             }
             return student.generateAuthToken()
                 .then((token) => {
-                    res.status(200).header('x-auth', token).send(student);
+                    res.status(200).header({'x-auth': token, 'access-control-expose-headers': 'x-auth'}).send({message: 'Login successful.'});
                 });
         })
         .catch((err) => {
