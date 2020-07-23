@@ -91,12 +91,12 @@ router.post('/login', (req, res) => {
     Admin.findOne({email, password})
         .then((admin) => {
             if(!admin) {
-                return res.status(404).json({emailerror: "Admin not found with this email"})
+                return res.status(404).json({err: "Check credentials."})
             }
 
             return admin.generateAuthToken()
                 .then((token) => {
-                    res.status(200).header('x-auth', token).send("admin login successful");
+                    res.status(200).header('x-auth', token).send({message: 'Login success'});
                 })
                 .catch((err) => {
                     res.status(400).send(err);
