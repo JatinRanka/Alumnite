@@ -643,7 +643,7 @@ router.get('/chatrooms/:id', alumniAuth, (req, res) => {
 
             ChatMessage
                 .find({chatRoomId})
-                .populate('senderId', 'collegeName firstName')
+                .populate('senderId', 'collegeName firstName adminName')
                 .then((messages) => {
                     res.send({
                         currentUserId: req.alumni._id,

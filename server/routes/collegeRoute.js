@@ -503,7 +503,7 @@ router.get('/chatrooms/:id', collegeAuth, (req, res) => {
 
             ChatMessage
                 .find({chatRoomId})
-                .populate('senderId', 'firstName collegeName')
+                .populate('senderId', 'firstName collegeName adminName')
                 .then((messages) => {
                     res.send({
                         currentUserId: req.college._id,
