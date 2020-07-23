@@ -25,6 +25,7 @@ const {collegeAuth} = require('./../middleware/collegeAuth');
 const {parseExcel} = require('./../controllers');
 
 const Services = require('./../services');
+const { values } = require('lodash');
 
 router.post('/email', collegeAuth, (req, res) => {
 
@@ -162,6 +163,9 @@ router.get('/users', collegeAuth, (req, res) => {
         params["$text"] = { $search: query["search"] };
         delete params["search"];
     }
+
+    params["collegeId"] = req.college._id;
+
     console.log(params);
 
     Alumni
@@ -499,7 +503,7 @@ router.get('/chatrooms/:id', collegeAuth, (req, res) => {
 
             ChatMessage
                 .find({chatRoomId})
-                .populate('senderId', 'firstName')
+                .populate('senderId', 'firstName collegeName')
                 .then((messages) => {
                     res.send({
                         currentUserId: req.college._id,
@@ -627,6 +631,41 @@ router.patch('/tickets/:id', collegeAuth, async (req, res) => {
     } 
 
 });
+
+
+router.get('/stats', collegeAuth, (req, res) => {
+
+    let collegeId= req.college._id;
+
+    
+    var promises = []
+
+    //past events
+    promises.push(Event.countDocuments( {organiserId: collegeId, date: { $lte : new Date()}} )  );
+
+    // upcoming events
+    promises.push(Event.countDocuments( {organiserId: collegeId, date: { $gte : new Date()}} )   );
+
+    // total jobs posted
+    promises.push(Job.countDocuments({collegeId}));
+
+    // total interviews posted
+    promises.push(Interview.countDocuments({collegeId}));
+
+
+    promises.push(Alumni.countDocuments({}))
+
+
+
+
+
+
+
+    Promise.all(promises)
+        .then((values) => res.send(values))
+        .catch((err) => res.status(500).send(err))
+
+})
 
 
 module.exports = router;
