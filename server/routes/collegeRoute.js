@@ -107,7 +107,7 @@ router.post('/login', (req, res) => {
             }
             return college.generateAuthToken()
                 .then((token) => {
-                    res.status(200).header('x-auth', token).send({user: college});
+                    res.status(200).header({'x-auth', token, 'access-control-expose-headers': 'x-auth'}).send({user: college});
                 })
                 .catch((err) => {
                     return Promise.reject(err)
@@ -636,7 +636,6 @@ router.patch('/tickets/:id', collegeAuth, async (req, res) => {
 router.get('/stats', collegeAuth, (req, res) => {
 
     let collegeId= req.college._id;
-
     
     var promises = []
 
