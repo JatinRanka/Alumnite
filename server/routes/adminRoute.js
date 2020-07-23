@@ -4,6 +4,7 @@ const router = express.Router();
 const _ = require('lodash');
 
 const {
+    Admin,
     College,
     Alumni,
     Student,
@@ -96,6 +97,9 @@ router.post('/login', (req, res) => {
             return admin.generateAuthToken()
                 .then((token) => {
                     res.status(200).header('x-auth', token).send("admin login successful");
+                })
+                .catch((err) => {
+                    res.status(400).send(err);
                 });
         })
         .catch((err) => {
