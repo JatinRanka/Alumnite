@@ -180,6 +180,55 @@ router.get('/alumni/:id', adminAuth, (req, res) => {
         .catch((err) => {
             res.status(500).send(err)
         });
+});
+
+router.get('/chatrooms', adminAuth, (req, res) => {
+    ChatRoom
+        .find({
+            collegeId: req.body.collegeId
+        })
+        .sort({ category: -1, year:1 })
+        .then((chatRooms) => {
+            res.send(chatRooms)
+        })
+        .catch((err) => {
+            res.status(500).send(err);
+        })
+});
+
+router.get('/chatrooms/:id', adminAuth, (req, res) => {
+    const chatRoomId = req.params.id;
+
+    ChatRoom
+        .findOne
+        ({
+            _id: chatRoomId
+        })
+        .lean()
+        .then((chatRoom) => {
+            if(!chatRoom){
+                return res.status(400).send({err: "Chatroom doesn't exist."});
+            }
+
+            ChatMessage
+                .find({chatRoomId})
+                .populate('senderId', 'firstName collegeName adminName')
+                .then((messages) => {
+                    res.send({
+                        currentUserId: req.admin._id,
+                        messages
+                    });
+                })  
+                .catch((err) => {
+                    console.log(err);                        
+                    res.status(500).send(err);
+                });
+        })
+        .catch((err) => {
+            console.log(err);
+            res.status(500).send(err)
+        });        
+
 })
 
 
