@@ -107,7 +107,7 @@ router.post('/login', (req, res) => {
             }
             return college.generateAuthToken()
                 .then((token) => {
-                    res.status(200).header({'x-auth', token, 'access-control-expose-headers': 'x-auth'}).send({user: college});
+                    res.status(200).header({'x-auth': token, 'access-control-expose-headers': 'x-auth'}).send({user: college});
                 })
                 .catch((err) => {
                     return Promise.reject(err)
