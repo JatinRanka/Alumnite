@@ -96,7 +96,7 @@ router.post('/login', (req, res) => {
 
             return admin.generateAuthToken()
                 .then((token) => {
-                    res.status(200).header('x-auth', token).send({message: 'Login success'});
+                    res.status(200).header({'x-auth': token, 'access-control-expose-headers': 'x-auth'}).send({message: "Login successful."});
                 })
                 .catch((err) => {
                     res.status(400).send(err);
