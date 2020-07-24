@@ -15,6 +15,7 @@ const {
     ChatMessage
 } = require('./../../models');
 
+const Services = require('./../../services');
 
 const {alumniAuth} = require('../../middleware/alumniAuth.js');
 
@@ -660,6 +661,18 @@ router.get('/chatrooms/:id', alumniAuth, (req, res) => {
         .catch((err) => {
             res.status(500).send(err)
         });     
+});
+
+router.get('/stats', alumniAuth, async (req, res) => {
+
+    try {
+        var stats = await Services.StatsService.fetchCollegeStats(req.alumni.collegeId);
+        res.send(stats);
+    } catch (err) {
+        console.log(err);
+        res.status(400).send(err)
+    }
+    
 });
 
 

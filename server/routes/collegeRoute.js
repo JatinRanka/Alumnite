@@ -25,7 +25,6 @@ const {collegeAuth} = require('./../middleware/collegeAuth');
 const {parseExcel} = require('./../controllers');
 
 const Services = require('./../services');
-const { values } = require('lodash');
 
 router.post('/email', collegeAuth, (req, res) => {
 
@@ -633,38 +632,17 @@ router.patch('/tickets/:id', collegeAuth, async (req, res) => {
 });
 
 
-router.get('/stats', collegeAuth, (req, res) => {
+router.get('/stats', collegeAuth, async (req, res) => {
 
-    let collegeId= req.college._id;
+    try {
+        var stats = await Services.StatsService.fetchCollegeStats(req.college._id);
+        res.send(stats)    
+    } catch (err) {
+        console.log(err);
+        res.status(400).send(err)
+    }
     
-    var promises = [];
-
-    // //past events
-    // promises.push(Event.countDocuments( {organiserId: collegeId, date: { $lte : new Date()}} )  );
-
-    // // upcoming events
-    // promises.push(Event.countDocuments( {organiserId: collegeId, date: { $gte : new Date()}} )   );
-
-    // // total jobs posted
-    // promises.push(Job.countDocuments({collegeId}));
-
-    // // total interviews posted
-    // promises.push(Interview.countDocuments({collegeId}));
-
-
-    // promises.push(Alumni.countDocuments({}))
-
-
-
-
-
-
-
-    Promise.all(promises)
-        .then((values) => res.send(values))
-        .catch((err) => res.status(500).send(err))
-
-})
+});
 
 
 module.exports = router;

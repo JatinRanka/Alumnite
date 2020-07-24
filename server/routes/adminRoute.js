@@ -17,6 +17,9 @@ const {
     ChatRoom,
     ChatMessage
 } = require('./../models');
+
+const Services = require('./../services')
+
 // MiddleWare
 const {adminAuth} = require('./../middleware/adminAuth.js')
 
@@ -229,7 +232,26 @@ router.get('/chatrooms/:id', adminAuth, (req, res) => {
             res.status(500).send(err)
         });        
 
-})
+});
+
+router.get('/stats', async (req, res) => {
+
+    try {
+        var stats;
+
+        if (req.body.collegeId){
+            stats = await Services.StatsService.fetchCollegeStats(req.body.collegeId);
+        } else{
+            stats = await Services.StatsService.fetchAdminStats();
+        }
+
+        res.send(stats);
+    } catch (err) {
+        console.log(err);
+        res.status(400).send(err)
+    }
+    
+});
 
 
 module.exports = router;
