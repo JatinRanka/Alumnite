@@ -1,6 +1,5 @@
 const models = require('./../models');
 const { ChatMessage } = require('../models/chatMessageModel');
-const { callbackPromise } = require('nodemailer/lib/shared');
 
 class ChatService {
 
