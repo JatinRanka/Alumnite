@@ -128,7 +128,7 @@ router.get('/profile', adminAuth, (req, res) => {
 
 
 // For search page, alumni directory
-router.get('/users', adminAuth, (req, res) => {
+router.get('/alumni', adminAuth, (req, res) => {
     const query = req.query;
     const params = {};   
 

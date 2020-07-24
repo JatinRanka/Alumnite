@@ -32,7 +32,7 @@ router.post('/email', collegeAuth, (req, res) => {
     Services.EmailService.fetchUsers(req.college._id, req.query)
         .then((alumnis) => {
             console.log(alumnis);
-            res.send(alumnis)
+            return res.send(alumnis);
             alumnis = ['jatinranka123@gmail.com' ]
             // return Services.EmailService.sendMail(to=alumnis, req.body.subject, req.body.message)
         })
@@ -139,7 +139,7 @@ router.get('/profile', collegeAuth, (req, res) => {
 
 
 // For search page, alumni directory
-router.get('/users', collegeAuth, (req, res) => {
+router.get('/alumni', collegeAuth, (req, res) => {
     const query = req.query;
     const params = {};   
 
@@ -637,22 +637,22 @@ router.get('/stats', collegeAuth, (req, res) => {
 
     let collegeId= req.college._id;
     
-    var promises = []
+    var promises = [];
 
-    //past events
-    promises.push(Event.countDocuments( {organiserId: collegeId, date: { $lte : new Date()}} )  );
+    // //past events
+    // promises.push(Event.countDocuments( {organiserId: collegeId, date: { $lte : new Date()}} )  );
 
-    // upcoming events
-    promises.push(Event.countDocuments( {organiserId: collegeId, date: { $gte : new Date()}} )   );
+    // // upcoming events
+    // promises.push(Event.countDocuments( {organiserId: collegeId, date: { $gte : new Date()}} )   );
 
-    // total jobs posted
-    promises.push(Job.countDocuments({collegeId}));
+    // // total jobs posted
+    // promises.push(Job.countDocuments({collegeId}));
 
-    // total interviews posted
-    promises.push(Interview.countDocuments({collegeId}));
+    // // total interviews posted
+    // promises.push(Interview.countDocuments({collegeId}));
 
 
-    promises.push(Alumni.countDocuments({}))
+    // promises.push(Alumni.countDocuments({}))
 
 
 

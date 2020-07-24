@@ -425,7 +425,7 @@ router.post('/tickets', alumniAuth, (req, res) => {
 });
 
 
-router.get('/users',alumniAuth, (req, res) => {
+router.get('/alumni', alumniAuth, (req, res) => {
     const query = req.query;
     const params = {};   
 
@@ -464,7 +464,7 @@ router.get('/users',alumniAuth, (req, res) => {
 });
 
 
-router.get('/users/:id', alumniAuth, (req, res) => {
+router.get('/alumni/:id', alumniAuth, (req, res) => {
     var userId = req.params.id;
 
     Alumni
