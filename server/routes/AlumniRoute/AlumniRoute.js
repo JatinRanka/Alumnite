@@ -449,6 +449,9 @@ router.get('/alumni', alumniAuth, (req, res) => {
         params["$text"] = { $search: query["search"] };
         delete params["search"];
     }
+
+    params["collegeId"] = req.alumni.collegeId;
+
     console.log(params);
 
     Alumni
