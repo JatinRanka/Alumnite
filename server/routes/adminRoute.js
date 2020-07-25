@@ -234,7 +234,7 @@ router.get('/chatrooms/:id', adminAuth, (req, res) => {
 
 });
 
-router.get('/stats', async (req, res) => {
+router.get('/stats', adminAuth, async (req, res) => {
 
     try {
         var stats;

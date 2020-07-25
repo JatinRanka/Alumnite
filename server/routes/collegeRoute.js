@@ -608,6 +608,7 @@ router.patch('/tickets/:id', collegeAuth, async (req, res) => {
         }
 
         console.log(ticket);
+        console.log(req.body);
 
         if(req.body.subject && req.body.message){
             // const email = ticket.postedBy.email;
@@ -622,10 +623,12 @@ router.patch('/tickets/:id', collegeAuth, async (req, res) => {
                 res.status(200).send(ticket)
             })
             .catch((err) => {
+                console.log(err);
                 res.status(500).send(err);        
             })
          
     } catch (err) {
+        console.log(err);
         res.status(500).send({err});    
     } 
 
