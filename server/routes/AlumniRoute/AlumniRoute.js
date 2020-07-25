@@ -12,7 +12,8 @@ const {
     Ticket,
     Fund,
     ChatRoom,
-    ChatMessage
+    ChatMessage,
+    Notice
 } = require('./../../models');
 
 const Services = require('./../../services');
@@ -675,6 +676,23 @@ router.get('/stats', alumniAuth, async (req, res) => {
     
 });
 
+router.get('/notices', alumniAuth, (req, res) => {
 
+    Notice
+        .find({
+            $or: [
+                { postedBy: req.alumni.collegeId },
+                { postedBy: req.alumni.adminId }
+            ]
+        })
+        .populate('postedBy', 'adminName collegeName')
+        .sort({expireAt: 1})
+        .then((notices) => {
+            res.status(200).send(notices);
+        })
+        .catch((err) => {
+            res.status(500).send(err);
+        });
+});
 
 module.exports = router;

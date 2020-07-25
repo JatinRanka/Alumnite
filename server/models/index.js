@@ -11,6 +11,7 @@ const {Ticket} = require('./ticketModel');
 const { Fund } = require('./fundModel');
 const { ChatRoom } = require('./chatRoomModel');
 const { ChatMessage } = require('./chatMessageModel')
+const {Notice } = require('./noticeModel');
 
 module.exports = {
     Admin,
@@ -24,5 +25,6 @@ module.exports = {
     Ticket,
     Fund,
     ChatRoom,
-    ChatMessage
+    ChatMessage,
+    Notice
 }

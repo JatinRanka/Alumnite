@@ -16,7 +16,8 @@ const {
     Ticket,
     Fund,
     ChatRoom,
-    ChatMessage
+    ChatMessage,
+    Notice
 } = require('./../models');
 
 
@@ -610,10 +611,10 @@ router.patch('/tickets/:id', collegeAuth, async (req, res) => {
         console.log(ticket);
         console.log(req.body);
 
-        if(req.body.subject && req.body.message){
+        if(req.body.message){
             // const email = ticket.postedBy.email;
             // const email = 'jatinranka123@gmail.com';
-            // const mailInfo = await Services.EmailService.sendMail(to=email, req.body.subject, req.body.message);
+            // const mailInfo = await Services.EmailService.sendMail(to=email, "Re: Ticket Update", req.body.message);
         }
 
         ticket.status = req.body.status;
@@ -645,6 +646,46 @@ router.get('/stats', collegeAuth, async (req, res) => {
         res.status(400).send(err)
     }
     
+});
+
+router.post('/notices', collegeAuth, (req, res) => {
+
+    const { title, subTitle, expireAt } = req.body;
+
+    const notice = new Notice({
+        postedBy: req.college._id,
+        onModel: 'College',
+        title,
+        subTitle,
+        expireAt
+    });
+
+    notice.save()
+        .then((notice) => {
+            res.status(201).send(notice);
+        })
+        .catch((err) => {
+            res.status(500).send(err);
+        });
+});
+
+router.get('/notices', collegeAuth, (req, res) => {
+
+    Notice
+        .find({
+            $or: [
+                { postedBy: req.college._id },
+                { postedBy: req.college.adminId }
+            ]
+        })
+        .populate('postedBy', 'adminName collegeName')
+        .sort({expireAt: 1})
+        .then((notices) => {
+            res.status(200).send(notices);
+        })
+        .catch((err) => {
+            res.status(500).send(err);
+        });
 });
 
 

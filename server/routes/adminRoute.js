@@ -15,7 +15,8 @@ const {
     Ticket,
     Fund,
     ChatRoom,
-    ChatMessage
+    ChatMessage,
+    Notice
 } = require('./../models');
 
 const Services = require('./../services')
@@ -251,6 +252,40 @@ router.get('/stats', adminAuth, async (req, res) => {
         res.status(400).send(err)
     }
     
+});
+
+router.post('/notices', adminAuth, (req, res) => {
+
+    const { title, subTitle, expireAt } = req.body;
+
+    const notice = new Notice({
+        postedBy: req.admin._id,
+        onModel: 'Admin',
+        title,
+        subTitle,
+        expireAt
+    });
+
+    notice.save()
+        .then((notice) => {
+            res.status(201).send(notice);
+        })
+        .catch((err) => {
+            res.status(500).send(err);
+        });
+});
+
+router.get('/notices', adminAuth, (req, res) => {
+    Notice
+        .find({})
+        .populate('postedBy', 'adminName collegeName')
+        .sort({expireAt: 1})
+        .then((notices) => {
+            res.status(200).send(notices);
+        })
+        .catch((err) => {
+            res.status(500).send(err);
+        });
 });
 
 
