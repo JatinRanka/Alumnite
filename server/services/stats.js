@@ -15,27 +15,34 @@ class StatsService{
         promises.push(models.Job
                         .find({collegeId})
                         .sort({createdAt: 1})
-                        .select("createdAt -_id")
+                        .select("createdAt -_id");
                     );
 
         // interviews posted
         promises.push(models.Interview
                                 .find({collegeId})
                                 .sort({createdAt: 1})
-                                .select("createdAt -_id")
+                                .select("createdAt -_id");
                             );
 
         // alumni registered
         promises.push(models.Alumni
                                 .find({collegeId})
                                 .sort({createdAt: 1})
-                                .select("createdAt -_id")
+                                .select("createdAt -_id");
                             );
 
 
         return new Promise((resolve, reject) => {
             Promise.all(promises)
                 .then( ( [pastEvents, upcomingEvents, jobs, interviews, alumni] ) => {
+
+                    // To convert array of documents to array of Date Strings.
+                    jobs = jobs.map( job => new Date( job["createdAt"]).toDateString() );
+
+                    interviews = interviews.map( interview => new Date( interview["createdAt"]).toDateString() );
+                    
+                    alumni = alumni.map( element => new Date( element["createdAt"]).toDateString() );
 
                     var stats = {
                         pastEvents, upcomingEvents, jobs, interviews, alumni
@@ -83,6 +90,13 @@ class StatsService{
         return new Promise((resolve, reject) => {
             Promise.all(promises)
                 .then( ( [pastEvents, upcomingEvents, jobs, interviews, alumni] ) => {
+
+                    // To convert array of documents to array of Date Strings.
+                    jobs = jobs.map( job => new Date( job["createdAt"]).toDateString() );
+
+                    interviews = interviews.map( interview => new Date( interview["createdAt"]).toDateString() );
+                    
+                    alumni = alumni.map( element => new Date( element["createdAt"]).toDateString() );
 
                     var stats = {
                         pastEvents, upcomingEvents, jobs, interviews, alumni
