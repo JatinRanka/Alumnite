@@ -1,5 +1,4 @@
 const models = require('./../models');
-const { reject } = require('lodash');
 
 class StatsService{
     static async fetchCollegeStats(collegeId){    
@@ -15,21 +14,21 @@ class StatsService{
         promises.push(models.Job
                         .find({collegeId})
                         .sort({createdAt: 1})
-                        .select("createdAt -_id");
+                        .select("createdAt -_id")
                     );
 
         // interviews posted
         promises.push(models.Interview
                                 .find({collegeId})
                                 .sort({createdAt: 1})
-                                .select("createdAt -_id");
+                                .select("createdAt -_id")
                             );
 
         // alumni registered
         promises.push(models.Alumni
                                 .find({collegeId})
                                 .sort({createdAt: 1})
-                                .select("createdAt -_id");
+                                .select("createdAt -_id")
                             );
 
 
