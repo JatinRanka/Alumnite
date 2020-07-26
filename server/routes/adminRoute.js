@@ -187,11 +187,13 @@ router.get('/alumni/:id', adminAuth, (req, res) => {
 });
 
 router.get('/chatrooms', adminAuth, (req, res) => {
+    console.log(req.query);
+    
     ChatRoom
         .find({
-            collegeId: req.body.collegeId
+            collegeId: req.query.collegeId
         })
-        .sort({ category: -1, year:1 })
+        .sort({ category: -1, year:1 }) 
         .then((chatRooms) => {
             res.send(chatRooms)
         })
@@ -204,8 +206,7 @@ router.get('/chatrooms/:id', adminAuth, (req, res) => {
     const chatRoomId = req.params.id;
 
     ChatRoom
-        .findOne
-        ({
+        .findOne({
             _id: chatRoomId
         })
         .lean()
@@ -276,6 +277,7 @@ router.post('/notices', adminAuth, (req, res) => {
 });
 
 router.get('/notices', adminAuth, (req, res) => {
+    
     Notice
         .find({})
         .populate('postedBy', 'adminName collegeName')
@@ -286,6 +288,25 @@ router.get('/notices', adminAuth, (req, res) => {
         .catch((err) => {
             res.status(500).send(err);
         });
+});
+
+router.post('/email', adminAuth, (req, res) => {
+
+    Services.EmailService.fetchUsers(null, req.query)
+        .then((alumnis) => {
+            console.log(alumnis);   
+            return res.send(alumnis);
+            alumnis = ['jatinranka123@gmail.com' ]
+            // return Services.EmailService.sendMail(to=alumnis, req.body.subject, req.body.message)
+        })
+        .then((mailInfo) => {
+            console.log(mailInfo);
+            res.send(mailInfo)
+        })
+        .catch((err) => {
+            console.log(err);
+            res.status(500).send(err);
+        })
 });
 
 
