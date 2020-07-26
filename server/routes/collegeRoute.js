@@ -456,6 +456,34 @@ router.get('/interviews/:id', collegeAuth, (req, res) => {
         });
 });
 
+router.get('/funds', collegeAuth, (req, res) => {
+    Fund
+        .find({ raisedBy: req.college._id })
+        .select("title subtitle totalRequired totalRaised")
+        .then((funds) => {
+            res.send(funds)
+        })
+        .catch((err) => {
+            res.status(500).send(err);
+        });
+})
+
+router.get('/funds/:id', collegeAuth, (req, res) => {
+    let fundId = req.params.id;
+
+    Fund
+        .findOne({
+            raisedBy: req.college._id,
+            _id: fundId
+        })
+        .then((fund) => {
+            res.send(fund)
+        })
+        .catch((err) => {
+            res.status(500).send(err);
+        })
+});
+
 router.post('/funds', collegeAuth, (req, res) => {
 
     req.body.raisedBy = req.college._id;
