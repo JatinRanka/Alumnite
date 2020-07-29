@@ -153,7 +153,17 @@ const AlumniSchema = new mongoose.Schema(
         skills: [{
             type: String,
             trim: true
-        }]
+        }],
+        locationPoint: {
+            type: {
+                type: String,
+                default: 'Point',
+                required: true
+            },
+            coordinates: {
+                type: [Number]
+            }
+        }
     },
     {timestamps: true}
 );
@@ -210,8 +220,13 @@ AlumniSchema.methods.removeToken = function(token){
     });
 }
 
+AlumniSchema.index({ locationPoint: '2dsphere'});
+
 // for performing serach in entire document
 AlumniSchema.index({'$**': 'text'});
+
+// for performing location (Geo spatial) queries
+// AlumniSchema.index({ locationPoint: '2dsphere'});
 
 const Alumni = mongoose.model('Alumni', AlumniSchema);
 module.exports = {Alumni};
