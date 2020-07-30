@@ -22,7 +22,7 @@ const EventSchema = new mongoose.Schema(
         subtitle: {
             type: String
         },
-        decription: {
+        description: {
             type: String
         },
         organiserId: {
