@@ -3,13 +3,13 @@ const router = express.Router();
 
 const _ = require('lodash');
 
-
-const {Student} = require('../../models/studentModel');
-const {College} = require('./../../models/collegeModel.js');
-const {Admin} = require('./../../models/adminModel.js');
-const {Event} = require('./../../models/eventModel.js');
-const {Job} = require('./../../models/jobModel.js');
-const {Interview} = require('./../../models/interviewModel.js')
+const {
+    Student,
+    Event,
+    Job,
+    Interview,
+    Ticket
+} = require('./../../models');
 
 const {studentAuth} = require('../../middleware/studentAuth.js');
 
@@ -70,8 +70,8 @@ router.patch('/profile', studentAuth, (req, res) => {
             {new: true}  //Default value is False and it sends the old document. This statement means to send "new" (updated document) back, instead of old document.
         )
         .select('-tokens')
-        .then((alumni) => {
-            res.send(alumni);
+        .then((student) => {
+            res.send(student);
         })
         .catch((err) => {
             res.status(500).send(err)
@@ -159,22 +159,27 @@ router.post('/attend-event/:id', studentAuth, (req, res) =>{
 
 
 // post job
-router.post('/job', studentAuth, (req, res) => {
+router.post('/jobs', studentAuth, (req, res) => {
     res.status(403).send({"err" : "Student cannot post jobs."});
 });
 
 
-router.get('/job', studentAuth, (req, res) => {
+router.get('/jobs', studentAuth, (req, res) => {
+    var params = {};
 
+    params.collegeId = req.student.collegeId;
+
+    if("search" in req.query){
+        params["$text"] = { $search: req.query["search"] }
+    }
+    
     Job
-        .find({
-            collegeId: req.student.collegeId
-        })
+        .find(params)
         .then((jobs) => {
             res.send(jobs);
         })
         .catch((err) => {
-            res.status(500).send(err)
+            res.status(400).send(err)
         }); 
 });
 
@@ -201,16 +206,21 @@ router.post('/interview', studentAuth, (req, res) => {
 
 
 router.get('/interview', studentAuth, (req, res) => {
+    var params = {};
+
+    params.collegeId = req.student.collegeId;
+
+    if("search" in req.query){
+        params["$text"] = { $search: req.query["search"] }
+    }
 
     Interview
-        .find({
-            collegeId: req.student.collegeId
-        })
+        .find(params)
         .then((interviews) => {
             res.send(interviews);
         })
         .catch((err) => {
-            res.status(500).send(err);
+            res.status(400).send(err);
         })
 });
 
