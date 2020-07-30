@@ -25,55 +25,6 @@ const Services = require('./../services')
 const {adminAuth} = require('./../middleware/adminAuth.js')
 
 
-router.post('/test', (req, res) => {
-    var arr = [
-        {
-            "email": "college1@gmail.com",
-            "password": "pwd123",
-            collegeName: 'college1',
-            adminId: "5e8c46bca49607e8acf58c46"
-        },
-        {
-            email: "college2@gmail.com",
-            password: "pwd123",
-            collegeName: 'college2',
-            adminId: "5e8c46bca49607e8acf58c46"
-        },
-        {
-            email: "college3@gmail.com",
-            password: "pwd123",
-            collegeName: 'college3',
-            adminId: "5e8c46bca49607e8acf58c46"
-        }
-    ];
-
-    College.insertMany(arr, {ordered: false})
-        .then((result) => {
-            console.log(result);
-            res.send("done")
-        })
-        .catch((err) => {
-            console.log(err);
-            res.send(err)
-        })
-
-
-})
-
-
-// register new admin
-router.post('/add', (req, res) => {
-    var admin = new Admin(req.body);
-
-    admin.save()
-        .then(() => {
-            res.send({msg: 'admin added successfully.'})
-        })
-        .catch((err) => {
-            res.status(400).send(err)
-        })
-});
-
 // register new college
 router.post('/college', adminAuth, (req, res) => {
     req.body.adminId = req.admin._id;
@@ -307,6 +258,214 @@ router.post('/email', adminAuth, (req, res) => {
             console.log(err);
             res.status(500).send(err);
         })
+});
+
+router.get('/newsletters', adminAuth, (req, res) => {
+    NewsLetter
+        .find()
+        .select("name createdAt")
+        .sort({ 'createdAt': -1 })
+        .then((newsletters) => {
+            res.send(newsletters);
+        })
+        .catch((err) => {
+            res.status(500).send(err);
+        })
+})
+
+router.get('/newsletters/:id', adminAuth, (req, res) => {
+    var newsletterId = req.params.id;
+
+    NewsLetter
+        .findOne({
+            _id: newsletterId
+        })
+        .then((newsletter) => {
+            res.set("Content-Type", newsletter.contentType);
+            res.send(newsletter.data);
+        })
+        .catch((err) => {
+            console.log(err);
+        });
+});
+
+// Get list of events
+router.get('/events', adminAuth, (req, res) => {
+    
+    // returns only the events organised by the college
+    Event
+        .find({
+            date: { $gte : new Date()}
+        })
+        .select('-attendees')
+        .sort({'date': 1})
+        .then((events) => {
+
+            // events.forEach((event) => {
+            //     console.log(event.title);
+            //     event.attendeesCount = "kjajhsjk";
+            //     // delete event.attendees;
+            // })
+
+            // events = events.map(function(event){
+            //     event.set('attendeesCount', event.attendees.length, {strict: false})
+            //     console.log(event);
+            //     return event
+            // })
+
+            // console.table(events);
+            // console.log(events);                
+
+            res.send(events)
+        })
+        .catch((err) => {
+            res.status(400).send(err);
+        });
+});
+
+
+// For getting full profile of a particular event
+router.get('/events/:id', adminAuth, (req, res) => {
+    var eventId = req.params.id;
+    
+    Event
+        .findOne({
+            _id: eventId
+        })
+        .then((event) => {
+            event.populate('attendees', ['firstName'])
+                .execPopulate(function (err, event){
+                    if(err){
+                        res.status(500).send(err);
+                    }
+                    res.send({event})
+                });
+        })
+        .catch((err) => {
+            res.status(500).send(err);
+        });
+});
+
+router.get('/jobs', adminAuth, (req, res) => {
+    var params = {}
+
+    if("search" in req.query){
+        params["$text"] = { $search: req.query["search"] }
+    }
+    
+    Job
+        .find(params)
+        .then((jobs) => {
+            res.send(jobs);
+        })
+        .catch((err) => {
+            res.status(400).send(err)
+        }); 
+});
+
+
+router.get('/jobs/:id', adminAuth, (req, res) => {
+    var jobId = req.params.id;
+
+    Job 
+        .findOne({
+            _id: jobId
+        })
+        .then((jobs) => {
+            res.send(jobs);
+        })
+        .catch((err) => {
+            res.status(400).send(err);
+        });
+});
+
+
+router.get('/interviews', adminAuth, (req, res) => {
+    var params = {};
+
+    if("search" in req.query){
+        params["$text"] = { $search: req.query["search"] }
+    }
+
+    Interview
+        .find(params)
+        .then((interviews) => {
+            res.send(interviews);
+        })
+        .catch((err) => {
+            res.status(400).send(err);
+        })
+});
+
+router.get('/interviews/:id', adminAuth, (req, res) => {
+    var interviewId = req.params.id;
+
+    Interview
+        .findOne({
+            _id: interviewId
+        })
+        .then((interview) => {
+            res.send(interview);
+        })
+        .catch((err) => {
+            res.status(400).send(err);
+        });
+});
+
+router.get('/funds', adminAuth, (req, res) => {
+    Fund
+        .find()
+        .select("title subtitle totalRequired totalRaised")
+        .then((funds) => {
+            res.send(funds)
+        })
+        .catch((err) => {
+            res.status(500).send(err);
+        });
+})
+
+router.get('/funds/:id', adminAuth, (req, res) => {
+    let fundId = req.params.id;
+
+    Fund
+        .findOne({
+            _id: fundId
+        })
+        .then((fund) => {
+            res.send(fund)
+        })
+        .catch((err) => {
+            res.status(500).send(err);
+        })
+});
+
+router.get('/tickets', adminAuth, (req, res) => {
+    Ticket
+        .find()
+        .select('-description')
+        .then((tickets) => {
+            res.status(200).send(tickets);
+        })
+        .catch((err) => {
+            res.status(500).send(err);
+        });
+});
+
+router.get('/tickets/:id', adminAuth, (req, res) => {
+    Ticket
+        .findOne({
+            _id: req.params.id
+        })
+        .populate('postedBy', 'firstName lastName')
+        .then((ticket) => {
+            if(!ticket){
+                return res.status(404).send({err: 'Ticket not found.'})
+            }
+            res.status(200).send(ticket);
+        })
+        .catch((err) => {
+            res.status(500).send(err);
+        });
 });
 
 
