@@ -162,7 +162,7 @@ const AlumniSchema = new mongoose.Schema(
             },
             coordinates: {
                 type: [Number],
-                default: [0, 0]
+                default: [200, 200]
             }
         }
     },
