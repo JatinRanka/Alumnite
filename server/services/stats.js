@@ -31,10 +31,26 @@ class StatsService{
                                 .select("createdAt -_id")
                             );
 
+        // tickets 
+        promises.push(models.Ticket
+                        .aggregate([
+                            {$match: { collegeId } },
+                            {
+                                $group: {
+                                    _id: '$status',
+                                    count: {$sum: 1}
+                                }
+                            }
+                        ])
+            );
+
+        // student count
+        promises.push(models.Student.countDocuments({collegeId}));
+
 
         return new Promise((resolve, reject) => {
             Promise.all(promises)
-                .then( ( [pastEvents, upcomingEvents, jobs, interviews, alumni] ) => {
+                .then( ( [pastEvents, upcomingEvents, jobs, interviews, alumni, tickets, studentsCount] ) => {
 
                     // To convert array of documents to array of Date Strings.
                     jobs = jobs.map( job => new Date( job["createdAt"]).toDateString() );
@@ -44,7 +60,7 @@ class StatsService{
                     alumni = alumni.map( element => new Date( element["createdAt"]).toDateString() );
 
                     var stats = {
-                        pastEvents, upcomingEvents, jobs, interviews, alumni
+                        pastEvents, upcomingEvents, jobs, interviews, alumni, tickets, studentsCount
                     }
                     resolve(stats);
                 })
@@ -55,7 +71,7 @@ class StatsService{
 
     }
 
-    static async fetchAdminStats(collegeId){    
+    static async fetchAdminStats(){    
         var promises = [];
 
         //past events
@@ -85,10 +101,26 @@ class StatsService{
                                 .select("createdAt -_id")
                             );
 
+        // tickets 
+        promises.push(models.Ticket
+                                .aggregate([
+                                    {
+                                        $group: {
+                                            _id: '$status',
+                                            count: {$sum: 1}
+                                        }
+                        
+                                    }
+                                ])
+        );
+
+    // student count
+    promises.push(models.Student.countDocuments());
+
 
         return new Promise((resolve, reject) => {
             Promise.all(promises)
-                .then( ( [pastEvents, upcomingEvents, jobs, interviews, alumni] ) => {
+                .then( ( [pastEvents, upcomingEvents, jobs, interviews, alumni, tickets, studentsCount] ) => {
 
                     // To convert array of documents to array of Date Strings.
                     jobs = jobs.map( job => new Date( job["createdAt"]).toDateString() );
@@ -98,7 +130,7 @@ class StatsService{
                     alumni = alumni.map( element => new Date( element["createdAt"]).toDateString() );
 
                     var stats = {
-                        pastEvents, upcomingEvents, jobs, interviews, alumni
+                        pastEvents, upcomingEvents, jobs, interviews, alumni, tickets, studentsCount
                     }
                     resolve(stats);
                 })
