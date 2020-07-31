@@ -349,7 +349,7 @@ router.get('/events/:id', adminAuth, (req, res) => {
 router.get('/jobs', adminAuth, (req, res) => {
     var params = {}
 
-    if("search" in req.query){
+    if("search" in req.query && req.query["search"]){
         params["$text"] = { $search: req.query["search"] }
     }
     
@@ -383,7 +383,7 @@ router.get('/jobs/:id', adminAuth, (req, res) => {
 router.get('/interviews', adminAuth, (req, res) => {
     var params = {};
 
-    if("search" in req.query){
+    if("search" in req.query && req.query["search"]){
         params["$text"] = { $search: req.query["search"] }
     }
 

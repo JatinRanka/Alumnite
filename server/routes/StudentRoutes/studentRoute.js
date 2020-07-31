@@ -169,7 +169,7 @@ router.get('/jobs', studentAuth, (req, res) => {
 
     params.collegeId = req.student.collegeId;
 
-    if("search" in req.query){
+    if("search" in req.query && req.query["search"]){
         params["$text"] = { $search: req.query["search"] }
     }
     
@@ -210,7 +210,7 @@ router.get('/interview', studentAuth, (req, res) => {
 
     params.collegeId = req.student.collegeId;
 
-    if("search" in req.query){
+    if("search" in req.query && req.query["search"]){
         params["$text"] = { $search: req.query["search"] }
     }
 
