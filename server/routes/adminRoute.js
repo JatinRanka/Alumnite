@@ -443,6 +443,7 @@ router.get('/tickets', adminAuth, (req, res) => {
     Ticket
         .find()
         .select('-description')
+        .populate('postedBy', 'firstName lastName')
         .then((tickets) => {
             res.status(200).send(tickets);
         })

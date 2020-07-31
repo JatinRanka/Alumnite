@@ -593,6 +593,7 @@ router.get('/tickets', collegeAuth, (req, res) => {
         .find({
             collegeId: req.college._id
         })
+        .populate('postedBy', 'firstName lastName')
         .select('-description')
         .then((tickets) => {
             res.status(200).send(tickets);
