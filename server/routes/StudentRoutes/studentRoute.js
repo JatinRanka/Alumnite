@@ -200,12 +200,12 @@ router.get('/jobs/:id', studentAuth, (req, res) => {
 });
 
 
-router.post('/interview', studentAuth, (req, res) => {
+router.post('/interviews', studentAuth, (req, res) => {
     res.status(403).send({"err": "Students cannot post interviews."})
 });
 
 
-router.get('/interview', studentAuth, (req, res) => {
+router.get('/interviews', studentAuth, (req, res) => {
     var params = {};
 
     params.collegeId = req.student.collegeId;
