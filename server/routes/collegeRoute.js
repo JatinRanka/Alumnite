@@ -594,6 +594,7 @@ router.get('/tickets', collegeAuth, (req, res) => {
             collegeId: req.college._id
         })
         .populate('postedBy', 'firstName lastName')
+        .sort({createdAt: 1})
         .select('-description')
         .then((tickets) => {
             res.status(200).send(tickets);

@@ -444,6 +444,7 @@ router.get('/tickets', adminAuth, (req, res) => {
         .find()
         .select('-description')
         .populate('postedBy', 'firstName lastName')
+        .sort({createdAt: 1})
         .then((tickets) => {
             res.status(200).send(tickets);
         })
