@@ -80,8 +80,12 @@ router.post('/login', (req, res) => {
     Alumni.findOne({email, password}) 
         .then((alumni) => {
             if(!alumni) {
-                res.status(404).send({'err': 'Invalid Credentials.'});
+                return res.status(404).send({'err': 'Invalid Credentials.'});
             }
+            if(!alumni.verified){
+                return res.status(404).send({'err': 'Alumni not verified.'});
+            }
+
             return alumni.generateAuthToken()    
                 .then((token) => {
                     res.status(200).header({'x-auth': token, 'access-control-expose-headers': 'x-auth'}).send({user:alumni});
