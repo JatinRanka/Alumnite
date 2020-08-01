@@ -141,10 +141,12 @@ const AlumniSchema = new mongoose.Schema(
         },
         socialProfiles: {
             facebook: {
-                type: String
+                type: String,
+                default: 'https://www.facebook.com/'
             },
             linkedin: {
-                type: String
+                type: String,
+                default: 'https://www.linkedin.com/'
             }
         },
         imageUrl: {
