@@ -457,6 +457,7 @@ router.get('/alumni', alumniAuth, (req, res) => {
     }
 
     params["collegeId"] = req.alumni.collegeId;
+    params["verified"] = true;
 
     console.log(params);
 
