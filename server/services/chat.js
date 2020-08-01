@@ -14,7 +14,7 @@ class ChatService {
         console.log(chatMessage);
 
 
-        const options = [{path:'senderId', select:'firstName'}]
+        const options = [{path:'senderId', select:'firstName collegeName adminName'}]
 
         
         // chatMessage.save(function(error, chatMessage){ 
