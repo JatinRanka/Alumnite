@@ -55,9 +55,23 @@ router.post('/insertAlumniExcel',
         req.data.forEach((alumni) => {
             alumni["collegeId"] = req.college._id;
             alumni["adminId"] = req.college.adminId;
-            alumni["password"] = Math.random().toString(36).substring(2, 15) // This will generate random password.
-        }) 
+            alumni["verified"] = true;
 
+            alumni["education"] = [{
+                "startYear": alumni.startYear.toString(),
+                "endYear": alumni.endYear.toString(),
+                "course": alumni.degree,
+                "school": req.college.collegeName
+            }];
+
+            alumni["location"] = {
+                city: '',
+                state: '',
+                country: ''
+            }
+
+            // alumni["password"] = Math.random().toString(36).substring(2, 15) // This will generate random password.
+        }) 
         Alumni
             .insertMany(
                 req.data,
@@ -67,6 +81,7 @@ router.post('/insertAlumniExcel',
                 }
             )
             .then((result) => {
+                console.log(result);            
                 res.send(result)
             })
             .catch((err) => {
@@ -165,6 +180,7 @@ router.get('/alumni', collegeAuth, (req, res) => {
     }
 
     params["collegeId"] = req.college._id;
+    params["verified"] = true;
 
     console.log(params);
 
