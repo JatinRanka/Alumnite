@@ -108,7 +108,10 @@ router.get('/alumni', adminAuth, (req, res) => {
         delete params["search"];
     }
 
-    params["verified"] = true;
+    if ( !("verified" in params) ){
+        params["verified"] = true;
+    }
+    
     console.log(params);
 
     Alumni
