@@ -14,6 +14,11 @@ var alumniAuth = (req, res, next) => {
                 console.log(alumni);
                 return res.status(400).send({'err': "Token invalid."});
             }
+
+            if(!alumni.verified){
+                return res.status(400).send({'err': "Alumni not verified."});
+            }
+
             req.alumni = alumni;
             req.token = token;
 
