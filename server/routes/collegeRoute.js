@@ -17,7 +17,8 @@ const {
     Fund,
     ChatRoom,
     ChatMessage,
-    Notice
+    Notice,
+    Faculty
 } = require('./../models');
 
 
@@ -755,6 +756,26 @@ router.get('/notices', collegeAuth, (req, res) => {
             res.status(500).send(err);
         });
 });
+
+router.post('/faculty', collegeAuth, (req, res) => {
+    const { email } = req.body;
+    // const password = Math.random().toString(36).substring(2, 15) // This will generate random password.
+    const password = 'pwd123';
+
+    const faculty = new Faculty({
+        email,
+        password,
+        collegeId: req.college._id
+    });
+
+    faculty.save()
+        .then((faculty) => {
+            res.status(200).send(faculty)
+        })
+        .catch((err) => {
+            res.status(500).send(err);
+        });
+})
 
 
 module.exports = router;
