@@ -32,7 +32,7 @@ router.post('/email', collegeAuth, (req, res) => {
     Services.EmailService.fetchUsers(req.college._id, req.query)
         .then((alumnis) => {
             console.log(alumnis);
-            // return res.send(alumnis);
+            return res.send(alumnis);
             alumnis = ['jatinranka123@gmail.com' ];
 
             var subject = req.body.subject
@@ -40,7 +40,7 @@ router.post('/email', collegeAuth, (req, res) => {
 
             if (req.body.category === "inviteMail") {
                 subject = `Re: Event Invitation`;
-                
+
                 message = (`
                     Hello,
                     ${req.college.collegeName} would like to invite you for a seminar.
