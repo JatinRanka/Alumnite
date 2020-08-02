@@ -32,9 +32,27 @@ router.post('/email', collegeAuth, (req, res) => {
     Services.EmailService.fetchUsers(req.college._id, req.query)
         .then((alumnis) => {
             console.log(alumnis);
-            return res.send(alumnis);
-            alumnis = ['jatinranka123@gmail.com' ]
-            // return Services.EmailService.sendMail(to=alumnis, req.body.subject, req.body.message)
+            // return res.send(alumnis);
+            alumnis = ['jatinranka123@gmail.com' ];
+
+            var subject = req.body.subject
+            var message = req.body.message;            
+
+            if (req.body.category === "inviteMail") {
+                subject = `Re: Event Invitation`;
+                
+                message = (`
+                    Hello,
+                    ${req.college.collegeName} would like to invite you for a seminar.
+                    Details:
+                    Event Name: ${req.body.eventName}
+                    Date: ${req.body.date}
+                    Time: ${req.body.time}
+                    Venue: ${req.body.venue}
+                `);
+            }
+
+            return Services.EmailService.sendMail(to=alumnis, subject, message);
         })
         .then((mailInfo) => {
             console.log(mailInfo);
