@@ -760,6 +760,7 @@ router.get('/notices', collegeAuth, (req, res) => {
 router.post('/faculty', collegeAuth, (req, res) => {
     const { email } = req.body;
     // const password = Math.random().toString(36).substring(2, 15) // This will generate random password.
+
     const password = 'pwd123';
 
     const faculty = new Faculty({
@@ -770,7 +771,8 @@ router.post('/faculty', collegeAuth, (req, res) => {
 
     faculty.save()
         .then((faculty) => {
-            res.status(200).send(faculty)
+            res.status(200).send(faculty);
+            // Services.EmailService.sendMail([email], 'new registration', `Password : ${password}`);
         })
         .catch((err) => {
             res.status(500).send(err);
