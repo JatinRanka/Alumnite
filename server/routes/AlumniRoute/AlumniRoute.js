@@ -38,9 +38,13 @@ router.post('/facebookLogin', async (req, res) => {
             res.status(404).send({'err': 'No user found with this FaceBook account.'})
         };
 
-        let token = await alumni.generateAuthToken();
-
-        res.status(200).header('x-auth', token).send({user:alumni});
+        return alumni.generateAuthToken()    
+                .then((token) => {
+                    res.status(200).header({'x-auth': token, 'access-control-expose-headers': 'x-auth'}).send({user:alumni});
+                })
+                .catch((err) => {
+                    res.status(400).send(err)
+                })
 
     } catch (err) {
         console.log(err);
