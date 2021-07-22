@@ -28,7 +28,7 @@
     "sinon": "^9.0.2",
     "socket.io": "^2.3.0",
     "stripe": "^8.64.0",
-    "xlsx": "^0.16.2"
+    "xlsx": "^0.17.0"
   },
   "devDependencies": {
     "chai": "^4.2.0",
